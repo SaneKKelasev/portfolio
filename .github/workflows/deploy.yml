@@ -1,4 +1,4 @@
-name: Deploy Laravel
+name: CI/CD Laravel
 
 on:
   push:
@@ -14,18 +14,91 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    name: Deploy to Production
+  ci:
+    name: Test and Build
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate Composer
+        run: composer validate --strict
+
+      - name: Install PHP Dependencies
+        run: |
+          composer install \
+            --no-interaction \
+            --prefer-dist \
+            --no-progress
+
+      - name: Prepare Laravel Environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run PHP Tests
+        run: php artisan test
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Frontend
+        run: npm run build
+
+      - name: Verify Vite Manifest
+        run: test -f public/build/manifest.json
+
+      - name: Package Frontend Build
+        run: tar -czf frontend-build.tar.gz public/build
+
+      - name: Upload Frontend Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: frontend-build-${{ github.sha }}
+          path: frontend-build.tar.gz
+          retention-days: 7
+          if-no-files-found: error
+
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: ci
+
+    steps:
+      - name: Download Frontend Artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: frontend-build-${{ github.sha }}
+
+      - name: Upload Frontend Build to Server
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          source: frontend-build.tar.gz
+          target: /tmp
+          overwrite: true
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.2
-
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
@@ -34,31 +107,46 @@ jobs:
           command_timeout: 10m
 
           script: |
-              set -e
+            set -Eeuo pipefail
 
-              cd /var/www/projects/portfolio
-            
-              php artisan down --retry=60
-              trap 'php artisan up' EXIT
-            
-              git fetch origin main
-              git reset --hard origin/main
-            
-              composer install \
-                --no-interaction \
-                --prefer-dist \
-                --optimize-autoloader \
-                --no-dev
-            
-              npm ci
-              npm run build
-            
-              php artisan migrate --force
-              php artisan optimize
-            
-              php artisan up
-              trap - EXIT
-            
-              curl --fail --silent --show-error https://portfoliohub.ru > /dev/null
-            
-              echo "✅ Deployment completed successfully."
+            PROJECT_DIR="/var/www/projects/portfolio"
+            BUILD_ARCHIVE="/tmp/frontend-build.tar.gz"
+
+            cd "$PROJECT_DIR"
+
+            php artisan down --retry=60
+            trap 'php artisan up' EXIT
+
+            git fetch origin main
+            git reset --hard origin/main
+
+            composer install \
+              --no-interaction \
+              --prefer-dist \
+              --optimize-autoloader \
+              --no-dev \
+              --no-progress
+
+            test -f "$BUILD_ARCHIVE"
+
+            rm -rf public/build
+            tar -xzf "$BUILD_ARCHIVE" -C "$PROJECT_DIR"
+            rm -f "$BUILD_ARCHIVE"
+
+            test -f public/build/manifest.json
+
+            php artisan migrate --force
+            php artisan optimize
+
+            php artisan up
+            trap - EXIT
+
+            curl \
+              --fail \
+              --silent \
+              --show-error \
+              --retry 5 \
+              --retry-delay 2 \
+              https://portfoliohub.ru/up > /dev/null
+
+            echo "Deployment completed successfully."

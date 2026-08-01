@@ -34,29 +34,31 @@ jobs:
           command_timeout: 10m
 
           script: |
-            set -e
+              set -e
 
-            cd /var/www/projects/portfolio
-
-            git fetch origin main
-            git reset --hard origin/main
-
-            php artisan down --retry=60
-            trap 'php artisan up' EXIT
-
-            composer install \
-              --no-interaction \
-              --prefer-dist \
-              --optimize-autoloader \
-              --no-dev
-
-            php artisan migrate --force
-
-            php artisan optimize
-
-            php artisan up
-            trap - EXIT
-
-            curl --fail --silent --show-error https://portfoliohub.ru > /dev/null
-
-            echo "✅ Deployment completed successfully."
+              cd /var/www/projects/portfolio
+            
+              php artisan down --retry=60
+              trap 'php artisan up' EXIT
+            
+              git fetch origin main
+              git reset --hard origin/main
+            
+              composer install \
+                --no-interaction \
+                --prefer-dist \
+                --optimize-autoloader \
+                --no-dev
+            
+              npm ci
+              npm run build
+            
+              php artisan migrate --force
+              php artisan optimize
+            
+              php artisan up
+              trap - EXIT
+            
+              curl --fail --silent --show-error https://portfoliohub.ru > /dev/null
+            
+              echo "✅ Deployment completed successfully."

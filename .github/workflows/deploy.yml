@@ -17,7 +17,7 @@ jobs:
   ci:
     name: Test and Build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout Repository
@@ -29,8 +29,9 @@ jobs:
           php-version: '8.3'
           coverage: none
           tools: composer:v2
+          extensions: mbstring, pdo_sqlite
 
-      - name: Validate Composer
+      - name: Validate Composer Configuration
         run: composer validate --strict
 
       - name: Install PHP Dependencies
@@ -40,19 +41,18 @@ jobs:
             --prefer-dist \
             --no-progress
 
-      - name: Prepare Laravel Environment
+      - name: Prepare Laravel Test Environment
         run: |
           cp .env.example .env
           php artisan key:generate
-
-      - name: Run PHP Tests
-        run: php artisan test
+          touch database/database.sqlite
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Install Node Dependencies
         run: npm ci
@@ -60,31 +60,44 @@ jobs:
       - name: Build Frontend
         run: npm run build
 
-      - name: Verify Vite Manifest
-        run: test -f public/build/manifest.json
+      - name: Verify Frontend Build
+        run: |
+          test -f public/build/manifest.json
+          test -d public/build/assets
+
+      - name: Run PHP Tests
+        run: php artisan test
 
       - name: Package Frontend Build
-        run: tar -czf frontend-build.tar.gz public/build
+        run: |
+          tar \
+            -czf "frontend-build-${{ github.sha }}.tar.gz" \
+            public/build
 
       - name: Upload Frontend Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
-          name: frontend-build-${{ github.sha }}
-          path: frontend-build.tar.gz
+          path: frontend-build-${{ github.sha }}.tar.gz
+          archive: false
           retention-days: 7
           if-no-files-found: error
 
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     needs: ci
 
     steps:
       - name: Download Frontend Artifact
         uses: actions/download-artifact@v7
         with:
-          name: frontend-build-${{ github.sha }}
+          path: deployment-artifact
+
+      - name: Verify Downloaded Artifact
+        run: |
+          test -f \
+            "deployment-artifact/frontend-build-${{ github.sha }}.tar.gz"
 
       - name: Upload Frontend Build to Server
         uses: appleboy/scp-action@v1
@@ -93,32 +106,40 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
-          source: frontend-build.tar.gz
+          source: deployment-artifact/frontend-build-${{ github.sha }}.tar.gz
           target: /tmp
+          strip_components: 1
           overwrite: true
 
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.2
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
-          command_timeout: 10m
+          command_timeout: 15m
 
           script: |
             set -Eeuo pipefail
 
             PROJECT_DIR="/var/www/projects/portfolio"
-            BUILD_ARCHIVE="/tmp/frontend-build.tar.gz"
+            DEPLOY_SHA="${{ github.sha }}"
+            BUILD_ARCHIVE="/tmp/frontend-build-${DEPLOY_SHA}.tar.gz"
 
             cd "$PROJECT_DIR"
 
-            php artisan down --retry=60
-            trap 'php artisan up' EXIT
+            cleanup() {
+              rm -f "$BUILD_ARCHIVE"
+              php artisan up >/dev/null 2>&1 || true
+            }
 
-            git fetch origin main
-            git reset --hard origin/main
+            trap cleanup EXIT
+
+            php artisan down --retry=60
+
+            git fetch --prune origin main
+            git reset --hard "$DEPLOY_SHA"
 
             composer install \
               --no-interaction \
@@ -129,17 +150,18 @@ jobs:
 
             test -f "$BUILD_ARCHIVE"
 
+            php artisan optimize:clear
+
             rm -rf public/build
             tar -xzf "$BUILD_ARCHIVE" -C "$PROJECT_DIR"
-            rm -f "$BUILD_ARCHIVE"
 
             test -f public/build/manifest.json
+            test -d public/build/assets
 
             php artisan migrate --force
             php artisan optimize
 
             php artisan up
-            trap - EXIT
 
             curl \
               --fail \
@@ -147,6 +169,10 @@ jobs:
               --show-error \
               --retry 5 \
               --retry-delay 2 \
+              --retry-connrefused \
               https://portfoliohub.ru/up > /dev/null
 
-            echo "Deployment completed successfully."
+            rm -f "$BUILD_ARCHIVE"
+            trap - EXIT
+
+            echo "Deployment of ${DEPLOY_SHA} completed successfully."

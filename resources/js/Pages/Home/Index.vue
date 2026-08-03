@@ -1,17 +1,38 @@
 <script setup>
-    import { ref } from 'vue';
+import ProjectCard from '@/Components/Project/Card.vue';
 
-    const title = ref('PortfolioHub');
-
-    function changeTitle() {
-        title.value = 'Hello';
-    }
+defineProps({
+    projects: {
+        type: Array,
+        required: true,
+    },
+});
 </script>
 
 <template>
-    <h1>{{ title }}</h1>
+    <main>
+        <section>
+            <header>
+                <p>Мои проекты</p>
 
-    <button type="button" @click="changeTitle">
-        Изменить заголовок
-    </button>
-</template>   
+                <h1>
+                    Проекты, которые я создаю
+                </h1>
+
+                <p>
+                    Каждый проект — это решение реальной задачи с вниманием
+                    к архитектуре, производительности и удобству использования.
+                </p>
+            </header>
+
+            <div>
+                <ProjectCard
+                    v-for="(project, index) in projects"
+                    :key="project.id"
+                    :project="project"
+                    :reverse="index % 2 === 1"
+                />
+            </div>
+        </section>
+    </main>
+</template>

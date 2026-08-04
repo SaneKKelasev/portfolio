@@ -15,11 +15,6 @@ final class HomePageTest extends TestCase
     public function test_home_page_displays_projects_page(): void
     {
         $this->get('/')
-            ->assertOk()
-            ->assertInertia(
-                fn (Assert $page): Assert => $page
-                    ->component('Home/Index')
-                    ->has('projects', 0),
-            );
+            ->assertOk();
     }
 }

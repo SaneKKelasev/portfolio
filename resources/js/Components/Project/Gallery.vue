@@ -6,8 +6,8 @@ const props = defineProps({
     },
 });
 
-const mainImage = props.images[0] ?? null;
-const thumbnails = props.images.slice(1, 5);
+const mainImage     = props.images[0] ?? null;
+const thumbnails    = props.images.slice(1, 5);
 </script>
 
 <template>
@@ -21,7 +21,7 @@ const thumbnails = props.images.slice(1, 5);
                        bg-background/60"
             >
                 <img
-                    :src="mainImage.path"
+                    :src="mainImage.url"
                     :alt="mainImage.alt ?? ''"
                     class="aspect-[16/10] h-full w-full object-cover
                            transition duration-500
@@ -37,7 +37,7 @@ const thumbnails = props.images.slice(1, 5);
                            bg-background/60"
                 >
                     <img
-                        :src="image.path"
+                        :src="image.url"
                         :alt="image.alt ?? ''"
                         class="aspect-[16/10] h-full w-full object-cover
                                transition duration-300

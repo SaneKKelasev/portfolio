@@ -2,6 +2,7 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { VueDatePicker } from '@vuepic/vue-datepicker';
+import { ru } from 'date-fns/locale';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { computed, ref } from 'vue';
 
@@ -59,9 +60,14 @@ const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
 const textareaClass = 'mt-2 w-full min-h-36 max-h-72 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 const caseTextareaClass = 'mt-2 w-full min-h-40 max-h-80 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 const datePickerClass = 'portfolio-date-picker mt-2';
+const datePickerFormats = {
+    input: 'dd.MM.yyyy',
+};
 const datePickerTimeConfig = {
     enableTimePicker: false,
 };
+const today = new Date();
+const russianDayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
 const uploadErrors = computed(() => Object.entries(form.errors)
     .filter(([key]) => key.startsWith('uploaded_images'))
@@ -309,38 +315,49 @@ function submit() {
 
                 <label class="block">
                     <span class="text-sm font-semibold text-text">Начало</span>
-                    <VueDatePicker
+
+                   <VueDatePicker
                         v-model="form.started_at"
                         :class="datePickerClass"
                         model-type="yyyy-MM-dd"
-                        format="dd.MM.yyyy"
-                        locale="ru"
-                        dark
-                        auto-apply
-                        clearable
+                        :formats="datePickerFormats"
+                        :day-names="russianDayNames"
+                        :max-date="today"
                         :time-config="datePickerTimeConfig"
+                        :auto-apply="true"
+                        :clearable="true"
+                        dark
                         placeholder="Выберите дату начала"
                     />
-                    <span v-if="form.errors.started_at" class="mt-2 block text-sm text-rose-300">
+
+                    <span
+                        v-if="form.errors.started_at"
+                        class="mt-2 block text-sm text-rose-300"
+                    >
                         {{ form.errors.started_at }}
                     </span>
                 </label>
 
-                <label class="block">
+               <label class="block">
                     <span class="text-sm font-semibold text-text">Завершение</span>
-                    <VueDatePicker
+
+                   <VueDatePicker
                         v-model="form.finished_at"
                         :class="datePickerClass"
                         model-type="yyyy-MM-dd"
-                        format="dd.MM.yyyy"
-                        locale="ru"
-                        dark
-                        auto-apply
-                        clearable
+                        :formats="datePickerFormats"
+                        :max-date="today"
                         :time-config="datePickerTimeConfig"
+                        :auto-apply="true"
+                        :clearable="true"
+                        dark
                         placeholder="Выберите дату завершения"
                     />
-                    <span v-if="form.errors.finished_at" class="mt-2 block text-sm text-rose-300">
+
+                    <span
+                        v-if="form.errors.finished_at"
+                        class="mt-2 block text-sm text-rose-300"
+                    >
                         {{ form.errors.finished_at }}
                     </span>
                 </label>

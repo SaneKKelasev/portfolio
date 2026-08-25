@@ -27,6 +27,24 @@ const uploadInput = ref(null);
 const isDragging = ref(false);
 let uploadedImageId = 0;
 
+const monthOptions = [
+    { value: '01', label: 'Январь' },
+    { value: '02', label: 'Февраль' },
+    { value: '03', label: 'Март' },
+    { value: '04', label: 'Апрель' },
+    { value: '05', label: 'Май' },
+    { value: '06', label: 'Июнь' },
+    { value: '07', label: 'Июль' },
+    { value: '08', label: 'Август' },
+    { value: '09', label: 'Сентябрь' },
+    { value: '10', label: 'Октябрь' },
+    { value: '11', label: 'Ноябрь' },
+    { value: '12', label: 'Декабрь' },
+];
+const currentYear = new Date().getFullYear();
+const yearOptions = Array.from({ length: 16 }, (_, index) => String(currentYear - index));
+const dayOptions = Array.from({ length: 31 }, (_, index) => String(index + 1).padStart(2, '0'));
+
 const form = useForm({
     title: props.project.title ?? '',
     description: props.project.description ?? '',
@@ -43,6 +61,10 @@ const form = useForm({
     uploaded_images: [],
     uploaded_images_meta: [],
 });
+const hasErrors = computed(() => Object.keys(form.errors).length > 0);
+
+const startedAt = ref(splitDate(props.project.started_at));
+const finishedAt = ref(splitDate(props.project.finished_at));
 
 const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
     id: `existing-${image.path}`,
@@ -55,6 +77,7 @@ const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
 
 const textareaClass = 'mt-2 w-full min-h-36 max-h-72 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 const caseTextareaClass = 'mt-2 w-full min-h-40 max-h-80 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
+const dateSelectClass = 'w-full rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 
 const uploadErrors = computed(() => Object.entries(form.errors)
     .filter(([key]) => key.startsWith('uploaded_images'))
@@ -67,6 +90,41 @@ function toggleTechnology(id) {
     }
 
     form.technologies = [...form.technologies, id];
+}
+
+function splitDate(value) {
+    if (!value) {
+        return {
+            day: '',
+            month: '',
+            year: '',
+        };
+    }
+
+    const [year, month, day] = value.split('-');
+
+    return {
+        day: day ?? '',
+        month: month ?? '',
+        year: year ?? '',
+    };
+}
+
+function composeDate(parts) {
+    if (!parts.day && !parts.month && !parts.year) {
+        return '';
+    }
+
+    if (!parts.day || !parts.month || !parts.year) {
+        return '';
+    }
+
+    return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
+function syncDates() {
+    form.started_at = composeDate(startedAt.value);
+    form.finished_at = composeDate(finishedAt.value);
 }
 
 function removeImage(index) {
@@ -175,6 +233,7 @@ function syncGalleryPayload() {
 }
 
 function submit() {
+    syncDates();
     syncGalleryPayload();
 
     form.transform((data) => ({
@@ -233,6 +292,14 @@ function submit() {
             {{ successMessage }}
         </div>
 
+        <div
+            v-if="hasErrors"
+            class="mt-6 rounded-2xl border border-rose-400/40 bg-rose-400/10
+                   px-4 py-3 text-sm font-semibold text-rose-200"
+        >
+            Проверьте поля формы. Некоторые данные нужно исправить перед сохранением.
+        </div>
+
         <form class="mt-8 space-y-8" @submit.prevent="submit">
             <section
                 class="grid gap-5 rounded-3xl border border-border
@@ -274,6 +341,9 @@ function submit() {
                                bg-background/70 px-4 py-3 text-text outline-none
                                focus:border-accent"
                     >
+                    <span v-if="form.errors.website_url" class="mt-2 block text-sm text-rose-300">
+                        {{ form.errors.website_url }}
+                    </span>
                 </label>
 
                 <label class="block">
@@ -284,28 +354,63 @@ function submit() {
                                bg-background/70 px-4 py-3 text-text outline-none
                                focus:border-accent"
                     >
+                    <span v-if="form.errors.repository_url" class="mt-2 block text-sm text-rose-300">
+                        {{ form.errors.repository_url }}
+                    </span>
                 </label>
 
                 <label class="block">
                     <span class="text-sm font-semibold text-text">Начало</span>
-                    <input
-                        v-model="form.started_at"
-                        type="date"
-                        class="mt-2 w-full rounded-2xl border border-border
-                               bg-background/70 px-4 py-3 text-text outline-none
-                               focus:border-accent"
-                    >
+                    <div class="mt-2 grid grid-cols-1 gap-2 rounded-2xl border border-border bg-background/35 p-2 sm:grid-cols-[5rem_1fr_6rem]">
+                        <select v-model="startedAt.day" :class="dateSelectClass">
+                            <option value="">День</option>
+                            <option v-for="day in dayOptions" :key="day" :value="day">
+                                {{ day }}
+                            </option>
+                        </select>
+                        <select v-model="startedAt.month" :class="dateSelectClass">
+                            <option value="">Месяц</option>
+                            <option v-for="month in monthOptions" :key="month.value" :value="month.value">
+                                {{ month.label }}
+                            </option>
+                        </select>
+                        <select v-model="startedAt.year" :class="dateSelectClass">
+                            <option value="">Год</option>
+                            <option v-for="year in yearOptions" :key="year" :value="year">
+                                {{ year }}
+                            </option>
+                        </select>
+                    </div>
+                    <span v-if="form.errors.started_at" class="mt-2 block text-sm text-rose-300">
+                        {{ form.errors.started_at }}
+                    </span>
                 </label>
 
                 <label class="block">
                     <span class="text-sm font-semibold text-text">Завершение</span>
-                    <input
-                        v-model="form.finished_at"
-                        type="date"
-                        class="mt-2 w-full rounded-2xl border border-border
-                               bg-background/70 px-4 py-3 text-text outline-none
-                               focus:border-accent"
-                    >
+                    <div class="mt-2 grid grid-cols-1 gap-2 rounded-2xl border border-border bg-background/35 p-2 sm:grid-cols-[5rem_1fr_6rem]">
+                        <select v-model="finishedAt.day" :class="dateSelectClass">
+                            <option value="">День</option>
+                            <option v-for="day in dayOptions" :key="day" :value="day">
+                                {{ day }}
+                            </option>
+                        </select>
+                        <select v-model="finishedAt.month" :class="dateSelectClass">
+                            <option value="">Месяц</option>
+                            <option v-for="month in monthOptions" :key="month.value" :value="month.value">
+                                {{ month.label }}
+                            </option>
+                        </select>
+                        <select v-model="finishedAt.year" :class="dateSelectClass">
+                            <option value="">Год</option>
+                            <option v-for="year in yearOptions" :key="year" :value="year">
+                                {{ year }}
+                            </option>
+                        </select>
+                    </div>
+                    <span v-if="form.errors.finished_at" class="mt-2 block text-sm text-rose-300">
+                        {{ form.errors.finished_at }}
+                    </span>
                 </label>
 
                 <label class="flex items-center gap-3 lg:col-span-2">

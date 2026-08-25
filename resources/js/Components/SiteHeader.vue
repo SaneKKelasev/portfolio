@@ -1,5 +1,9 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+const page = usePage();
+const adminHref = computed(() => (page.props.auth?.user ? '/admin' : '/login'));
 </script>
 
 <template>
@@ -39,7 +43,7 @@ import { Link } from '@inertiajs/vue3';
                 Контакты
             </a>
             <Link
-                href="/login"
+                :href="adminHref"
                 class="rounded-full bg-primary px-4 py-2 text-white
                        shadow-lg shadow-primary/20 transition
                        hover:bg-violet-500"

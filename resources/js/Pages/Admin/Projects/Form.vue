@@ -316,6 +316,7 @@ function submit() {
                         auto-apply
                         clearable
                         :enable-time-picker="false"
+                        :hide-navigation="['time']"
                         placeholder="Выберите дату начала"
                     />
                     <span v-if="form.errors.started_at" class="mt-2 block text-sm text-rose-300">
@@ -335,6 +336,7 @@ function submit() {
                         auto-apply
                         clearable
                         :enable-time-picker="false"
+                        :hide-navigation="['time']"
                         placeholder="Выберите дату завершения"
                     />
                     <span v-if="form.errors.finished_at" class="mt-2 block text-sm text-rose-300">
@@ -574,5 +576,10 @@ function submit() {
 
 .portfolio-date-picker :deep(.dp__menu) {
     box-shadow: 0 24px 70px rgb(0 0 0 / 0.45);
+}
+
+.portfolio-date-picker :deep(.dp--button-bottom),
+.portfolio-date-picker :deep([data-test-id="open-time-picker-btn"]) {
+    display: none;
 }
 </style>

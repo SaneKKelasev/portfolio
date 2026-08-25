@@ -1,6 +1,8 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { VueDatePicker } from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 import { computed, ref } from 'vue';
 
 const props = defineProps({
@@ -27,24 +29,6 @@ const uploadInput = ref(null);
 const isDragging = ref(false);
 let uploadedImageId = 0;
 
-const monthOptions = [
-    { value: '01', label: 'Январь' },
-    { value: '02', label: 'Февраль' },
-    { value: '03', label: 'Март' },
-    { value: '04', label: 'Апрель' },
-    { value: '05', label: 'Май' },
-    { value: '06', label: 'Июнь' },
-    { value: '07', label: 'Июль' },
-    { value: '08', label: 'Август' },
-    { value: '09', label: 'Сентябрь' },
-    { value: '10', label: 'Октябрь' },
-    { value: '11', label: 'Ноябрь' },
-    { value: '12', label: 'Декабрь' },
-];
-const monthLabels = monthOptions.map((month) => month.label);
-const currentYear = new Date().getFullYear();
-const dayOptions = Array.from({ length: 31 }, (_, index) => String(index + 1).padStart(2, '0'));
-
 const form = useForm({
     title: props.project.title ?? '',
     description: props.project.description ?? '',
@@ -63,9 +47,6 @@ const form = useForm({
 });
 const hasErrors = computed(() => Object.keys(form.errors).length > 0);
 
-const startedAt = ref(splitDate(props.project.started_at));
-const finishedAt = ref(splitDate(props.project.finished_at));
-
 const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
     id: `existing-${image.path}`,
     type: 'existing',
@@ -77,6 +58,7 @@ const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
 
 const textareaClass = 'mt-2 w-full min-h-36 max-h-72 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 const caseTextareaClass = 'mt-2 w-full min-h-40 max-h-80 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
+const datePickerClass = 'portfolio-date-picker mt-2';
 
 const uploadErrors = computed(() => Object.entries(form.errors)
     .filter(([key]) => key.startsWith('uploaded_images'))
@@ -89,107 +71,6 @@ function toggleTechnology(id) {
     }
 
     form.technologies = [...form.technologies, id];
-}
-
-function splitDate(value) {
-    if (!value) {
-        return {
-            day: '',
-            month: '',
-            year: '',
-        };
-    }
-
-    const [year, month, day] = value.split('-');
-
-    return {
-        day: day ?? '',
-        month: month ?? '',
-        year: year ?? '',
-    };
-}
-
-function composeDate(parts) {
-    if (!parts.day && !parts.month && !parts.year) {
-        return '';
-    }
-
-    if (!parts.day || !parts.month || !parts.year) {
-        return '';
-    }
-
-    return `${parts.year}-${parts.month}-${parts.day}`;
-}
-
-function syncDates() {
-    form.started_at = composeDate(startedAt.value);
-    form.finished_at = composeDate(finishedAt.value);
-}
-
-function displayMonth(parts) {
-    if (!parts.month) {
-        return 'Месяц';
-    }
-
-    return monthLabels[Number(parts.month) - 1];
-}
-
-function displayYear(parts) {
-    return parts.year || 'Год';
-}
-
-function daysInMonth(parts) {
-    const year = Number(parts.year || currentYear);
-    const month = Number(parts.month || new Date().getMonth() + 1);
-
-    return new Date(year, month, 0).getDate();
-}
-
-function visibleDayOptions(parts) {
-    return dayOptions.slice(0, daysInMonth(parts));
-}
-
-function clampDay(parts) {
-    if (parts.day && Number(parts.day) > daysInMonth(parts)) {
-        parts.day = String(daysInMonth(parts)).padStart(2, '0');
-    }
-}
-
-function shiftMonth(parts, direction) {
-    const currentMonth = parts.month ? Number(parts.month) : new Date().getMonth() + 1;
-    const nextMonth = ((currentMonth - 1 + direction + 12) % 12) + 1;
-    parts.month = String(nextMonth).padStart(2, '0');
-
-    if (!parts.year) {
-        parts.year = String(currentYear);
-    }
-
-    clampDay(parts);
-}
-
-function shiftYear(parts, direction) {
-    const year = parts.year ? Number(parts.year) : currentYear;
-    parts.year = String(year + direction);
-
-    clampDay(parts);
-}
-
-function selectDay(parts, day) {
-    parts.day = day;
-
-    if (!parts.month) {
-        parts.month = String(new Date().getMonth() + 1).padStart(2, '0');
-    }
-
-    if (!parts.year) {
-        parts.year = String(currentYear);
-    }
-}
-
-function clearDate(parts) {
-    parts.day = '';
-    parts.month = '';
-    parts.year = '';
 }
 
 function removeImage(index) {
@@ -298,7 +179,6 @@ function syncGalleryPayload() {
 }
 
 function submit() {
-    syncDates();
     syncGalleryPayload();
 
     form.transform((data) => ({
@@ -426,51 +306,18 @@ function submit() {
 
                 <label class="block">
                     <span class="text-sm font-semibold text-text">Начало</span>
-                    <div class="mt-2 rounded-2xl border border-border bg-background/45 p-3">
-                        <div class="grid gap-2 sm:grid-cols-[1fr_7rem]">
-                            <div class="flex items-center justify-between rounded-xl border border-border bg-background/70">
-                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftMonth(startedAt, -1)">
-                                    ←
-                                </button>
-                                <span class="text-sm font-semibold text-text">
-                                    {{ displayMonth(startedAt) }}
-                                </span>
-                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftMonth(startedAt, 1)">
-                                    →
-                                </button>
-                            </div>
-                            <div class="flex items-center justify-between rounded-xl border border-border bg-background/70">
-                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftYear(startedAt, -1)">
-                                    −
-                                </button>
-                                <span class="text-sm font-semibold text-text">
-                                    {{ displayYear(startedAt) }}
-                                </span>
-                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftYear(startedAt, 1)">
-                                    +
-                                </button>
-                            </div>
-                        </div>
-                        <div class="mt-3 grid grid-cols-7 gap-1">
-                            <button
-                                v-for="day in visibleDayOptions(startedAt)"
-                                :key="day"
-                                type="button"
-                                class="rounded-lg px-2 py-2 text-xs font-semibold transition"
-                                :class="
-                                    startedAt.day === day
-                                        ? 'bg-primary text-white'
-                                        : 'text-text-muted hover:bg-white/[0.04] hover:text-white'
-                                "
-                                @click="selectDay(startedAt, day)"
-                            >
-                                {{ day }}
-                            </button>
-                        </div>
-                        <button type="button" class="mt-3 text-xs font-semibold text-text-muted transition hover:text-white" @click="clearDate(startedAt)">
-                            Очистить дату
-                        </button>
-                    </div>
+                    <VueDatePicker
+                        v-model="form.started_at"
+                        :class="datePickerClass"
+                        model-type="yyyy-MM-dd"
+                        format="dd.MM.yyyy"
+                        locale="ru"
+                        dark
+                        auto-apply
+                        clearable
+                        :enable-time-picker="false"
+                        placeholder="Выберите дату начала"
+                    />
                     <span v-if="form.errors.started_at" class="mt-2 block text-sm text-rose-300">
                         {{ form.errors.started_at }}
                     </span>
@@ -478,51 +325,18 @@ function submit() {
 
                 <label class="block">
                     <span class="text-sm font-semibold text-text">Завершение</span>
-                    <div class="mt-2 rounded-2xl border border-border bg-background/45 p-3">
-                        <div class="grid gap-2 sm:grid-cols-[1fr_7rem]">
-                            <div class="flex items-center justify-between rounded-xl border border-border bg-background/70">
-                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftMonth(finishedAt, -1)">
-                                    ←
-                                </button>
-                                <span class="text-sm font-semibold text-text">
-                                    {{ displayMonth(finishedAt) }}
-                                </span>
-                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftMonth(finishedAt, 1)">
-                                    →
-                                </button>
-                            </div>
-                            <div class="flex items-center justify-between rounded-xl border border-border bg-background/70">
-                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftYear(finishedAt, -1)">
-                                    −
-                                </button>
-                                <span class="text-sm font-semibold text-text">
-                                    {{ displayYear(finishedAt) }}
-                                </span>
-                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftYear(finishedAt, 1)">
-                                    +
-                                </button>
-                            </div>
-                        </div>
-                        <div class="mt-3 grid grid-cols-7 gap-1">
-                            <button
-                                v-for="day in visibleDayOptions(finishedAt)"
-                                :key="day"
-                                type="button"
-                                class="rounded-lg px-2 py-2 text-xs font-semibold transition"
-                                :class="
-                                    finishedAt.day === day
-                                        ? 'bg-primary text-white'
-                                        : 'text-text-muted hover:bg-white/[0.04] hover:text-white'
-                                "
-                                @click="selectDay(finishedAt, day)"
-                            >
-                                {{ day }}
-                            </button>
-                        </div>
-                        <button type="button" class="mt-3 text-xs font-semibold text-text-muted transition hover:text-white" @click="clearDate(finishedAt)">
-                            Очистить дату
-                        </button>
-                    </div>
+                    <VueDatePicker
+                        v-model="form.finished_at"
+                        :class="datePickerClass"
+                        model-type="yyyy-MM-dd"
+                        format="dd.MM.yyyy"
+                        locale="ru"
+                        dark
+                        auto-apply
+                        clearable
+                        :enable-time-picker="false"
+                        placeholder="Выберите дату завершения"
+                    />
                     <span v-if="form.errors.finished_at" class="mt-2 block text-sm text-rose-300">
                         {{ form.errors.finished_at }}
                     </span>
@@ -718,3 +532,47 @@ function submit() {
         </form>
     </AdminLayout>
 </template>
+
+<style scoped>
+.portfolio-date-picker {
+    --dp-background-color: rgb(4 7 18);
+    --dp-text-color: rgb(248 250 252);
+    --dp-hover-color: rgb(255 255 255 / 0.06);
+    --dp-hover-text-color: rgb(255 255 255);
+    --dp-primary-color: rgb(139 92 246);
+    --dp-primary-text-color: rgb(255 255 255);
+    --dp-secondary-color: rgb(148 163 184);
+    --dp-border-color: rgb(56 71 104);
+    --dp-menu-border-color: rgb(56 71 104);
+    --dp-border-color-hover: rgb(34 211 238);
+    --dp-border-color-focus: rgb(34 211 238);
+    --dp-icon-color: rgb(203 213 225);
+    --dp-disabled-color: rgb(15 23 42);
+    --dp-disabled-color-text: rgb(100 116 139);
+    --dp-border-radius: 1rem;
+    --dp-cell-border-radius: 0.75rem;
+    --dp-input-padding: 0.875rem 2.75rem 0.875rem 1rem;
+    --dp-font-size: 1rem;
+    --dp-menu-min-width: 19rem;
+}
+
+.portfolio-date-picker :deep(.dp__input) {
+    border-color: rgb(56 71 104);
+    background-color: rgb(4 7 18 / 0.7);
+    color: rgb(248 250 252);
+    font-weight: 600;
+}
+
+.portfolio-date-picker :deep(.dp__input::placeholder) {
+    color: rgb(148 163 184);
+    font-weight: 500;
+}
+
+.portfolio-date-picker :deep(.dp__input_wrap:hover .dp__input) {
+    border-color: rgb(34 211 238);
+}
+
+.portfolio-date-picker :deep(.dp__menu) {
+    box-shadow: 0 24px 70px rgb(0 0 0 / 0.45);
+}
+</style>

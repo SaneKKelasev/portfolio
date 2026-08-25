@@ -87,9 +87,19 @@ function addFiles(files) {
                 type: 'upload',
                 file,
                 preview: URL.createObjectURL(file),
-                alt: file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' '),
+                alt: imageAltFromFileName(file.name),
             });
         });
+}
+
+function imageAltFromFileName(fileName) {
+    const alt = fileName.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim();
+
+    if (alt.length < 3 || /^\d+$/.test(alt)) {
+        return '';
+    }
+
+    return alt;
 }
 
 function selectUploads(event) {
@@ -414,12 +424,13 @@ function submit() {
                     <div
                         v-for="(image, index) in galleryItems"
                         :key="image.id"
-                        class="grid gap-4 rounded-2xl border border-border p-4
-                               lg:grid-cols-[11rem_minmax(0,1fr)_auto]
+                        class="grid gap-4 rounded-2xl border border-border
+                               bg-background/25 p-4
+                               lg:grid-cols-[12rem_minmax(0,1fr)]
                                lg:items-center"
                     >
                         <div
-                            class="aspect-video overflow-hidden rounded-2xl
+                            class="relative aspect-video overflow-hidden rounded-2xl
                                    border border-border bg-background/70"
                         >
                             <img
@@ -427,43 +438,41 @@ function submit() {
                                 :alt="image.alt || 'Изображение проекта'"
                                 class="h-full w-full object-cover"
                             >
+                            <span
+                                class="absolute left-2 top-2 rounded-full border
+                                       bg-background/80 px-3 py-1 text-xs
+                                       font-semibold backdrop-blur"
+                                :class="
+                                    index === 0
+                                        ? 'border-accent/60 text-accent'
+                                        : 'border-border-bright/60 text-text-muted'
+                                "
+                            >
+                                {{ index === 0 ? 'Главное' : `#${index + 1}` }}
+                            </span>
                         </div>
                         <div class="min-w-0">
-                            <div class="flex flex-wrap items-center gap-2 text-xs">
-                                <span
-                                    class="rounded-full border px-3 py-1
-                                           font-semibold"
-                                    :class="
-                                        index === 0
-                                            ? 'border-accent/60 text-accent'
-                                            : 'border-border-bright/60 text-text-muted'
-                                    "
-                                >
-                                    {{ index === 0 ? 'Главное' : `#${index + 1}` }}
+                            <label class="block">
+                                <span class="text-xs font-semibold text-text-muted">
+                                    Описание изображения
                                 </span>
-                                <span
-                                    v-if="image.file?.name"
-                                    class="max-w-full truncate text-text-muted/60"
-                                    :title="image.file.name"
-                                >
-                                    {{ image.file.name }}
-                                </span>
+                                <input v-model="image.alt" placeholder="Например: Главный экран проекта" class="mt-2 w-full rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent">
+                            </label>
+
+                            <div class="mt-3 flex flex-wrap items-center gap-2">
+                                <button type="button" :disabled="index === 0" class="rounded-full border border-border px-3 py-2 text-xs font-semibold text-text-muted transition enabled:hover:border-accent/70 enabled:hover:text-white disabled:opacity-40" @click="makeCover(index)">
+                                    Сделать главным
+                                </button>
+                                <button type="button" :disabled="index === 0" class="rounded-full border border-border px-3 py-2 text-xs font-semibold text-text-muted transition enabled:hover:border-accent/70 enabled:hover:text-white disabled:opacity-40" @click="moveImage(index, -1)">
+                                    Вверх
+                                </button>
+                                <button type="button" :disabled="index === galleryItems.length - 1" class="rounded-full border border-border px-3 py-2 text-xs font-semibold text-text-muted transition enabled:hover:border-accent/70 enabled:hover:text-white disabled:opacity-40" @click="moveImage(index, 1)">
+                                    Вниз
+                                </button>
+                                <button type="button" class="rounded-full border border-rose-400/50 px-3 py-2 text-xs font-semibold text-rose-300 transition hover:border-rose-300 hover:text-rose-200" @click="removeImage(index)">
+                                    Удалить
+                                </button>
                             </div>
-                            <input v-model="image.alt" placeholder="Описание изображения" class="mt-3 w-full rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent">
-                        </div>
-                        <div class="flex flex-wrap items-center justify-start gap-2 lg:justify-end">
-                            <button type="button" :disabled="index === 0" class="rounded-full border border-border px-3 py-2 text-xs font-semibold text-text-muted transition enabled:hover:border-accent/70 enabled:hover:text-white disabled:opacity-40" @click="makeCover(index)">
-                                Главная
-                            </button>
-                            <button type="button" :disabled="index === 0" class="rounded-full border border-border px-3 py-2 text-xs font-semibold text-text-muted transition enabled:hover:border-accent/70 enabled:hover:text-white disabled:opacity-40" @click="moveImage(index, -1)">
-                                Вверх
-                            </button>
-                            <button type="button" :disabled="index === galleryItems.length - 1" class="rounded-full border border-border px-3 py-2 text-xs font-semibold text-text-muted transition enabled:hover:border-accent/70 enabled:hover:text-white disabled:opacity-40" @click="moveImage(index, 1)">
-                                Вниз
-                            </button>
-                            <button type="button" class="rounded-full border border-rose-400/50 px-3 py-2 text-xs font-semibold text-rose-300 transition hover:border-rose-300 hover:text-rose-200" @click="removeImage(index)">
-                                Удалить
-                            </button>
                         </div>
                     </div>
 

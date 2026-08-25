@@ -15,7 +15,7 @@ const activeImage = computed(() => {
 });
 
 const thumbnails = computed(() => {
-    return props.images.slice(0, 3);
+    return props.images;
 });
 
 function selectImage(index) {
@@ -27,7 +27,8 @@ function selectImage(index) {
     <div class="min-w-0">
         <div
             v-if="activeImage"
-            class="overflow-hidden rounded-2xl border border-border bg-background/60"
+            class="overflow-hidden rounded-2xl border border-border-bright/70
+                   bg-background/70 shadow-2xl shadow-primary/10"
         >
             <img
                 :key="activeImage.id"
@@ -39,18 +40,19 @@ function selectImage(index) {
 
         <div
             v-if="images.length > 1"
-            class="mt-4 grid grid-cols-3 gap-4"
+            class="mt-4 grid grid-cols-3 gap-4 sm:grid-cols-5"
         >
             <button
                 v-for="(image, index) in thumbnails"
                 :key="image.id"
                 type="button"
+                :aria-label="`Показать изображение ${index + 1}`"
                 class="overflow-hidden rounded-xl border bg-background/60
                        transition duration-200"
                 :class="
                     index === activeIndex
-                        ? 'border-primary ring-2 ring-primary/30'
-                        : 'border-border hover:-translate-y-0.5 hover:border-primary/50'
+                        ? 'border-accent ring-2 ring-accent/30'
+                        : 'border-border hover:-translate-y-0.5 hover:border-primary/60'
                 "
                 @click="selectImage(index)"
             >

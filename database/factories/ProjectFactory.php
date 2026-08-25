@@ -25,12 +25,12 @@ class ProjectFactory extends Factory
         $title = fake()->unique()->sentence(3);
 
         return [
-            'title'             => $title,
-            'slug'              => Str::slug($title).'-'.fake()->unique()->numberBetween(1, 1_000_000),
-            'description'       => fake()->paragraphs(3, true),
-            'website_url'       => fake()->boolean(70) ? fake()->url() : null,
-            'repository_url'    => fake()->boolean(60) ? fake()->url() : null,
-            'published_at'      => fake()->boolean(75)
+            'title' => $title,
+            'slug' => Str::slug($title).'-'.fake()->unique()->numberBetween(1, 1_000_000),
+            'description' => fake()->paragraphs(3, true),
+            'website_url' => fake()->boolean(70) ? fake()->url() : null,
+            'repository_url' => fake()->boolean(60) ? fake()->url() : null,
+            'published_at' => fake()->boolean(75)
                 ? fake()->dateTimeBetween('-3 years', 'now')
                 : null,
         ];

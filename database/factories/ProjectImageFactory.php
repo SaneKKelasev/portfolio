@@ -22,9 +22,9 @@ final class ProjectImageFactory extends Factory
     public function definition(): array
     {
         return [
-            'path'          => fake()->imageUrl(1200, 800, 'technology'),
-            'alt'           => fake()->sentence(),
-            'sort_order'    => 1,
+            'path' => sprintf('projects/tests/%s.webp', fake()->unique()->uuid()),
+            'alt' => fake()->sentence(),
+            'sort_order' => fake()->unique()->numberBetween(1, 10_000),
         ];
     }
 }

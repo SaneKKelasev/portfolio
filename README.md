@@ -1,58 +1,98 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PortfolioHub
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+PortfolioHub — небольшое Laravel-приложение для публикации карточек проектов с изображениями, технологиями и внешними ссылками. Проект намеренно оставлен компактным: доменная логика следует стандартным Laravel-подходам, а публичный интерфейс построен на Inertia и Vue.
 
-## About Laravel
+## Стек
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.3
+- Laravel 13
+- Inertia.js
+- Vue 3
+- Tailwind CSS 4
+- SQLite по умолчанию для локальной разработки и тестов
+- PHPUnit
+- Laravel Pint
+- GitHub Actions
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Возможности
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Публичная главная страница со списком опубликованных проектов.
+- Галерея проекта с выбором изображения.
+- Технологии проекта через связь many-to-many.
+- Идемпотентные сидеры для демо-данных и изображений.
+- CI-проверки Composer metadata, PHP code style, frontend build и тестов.
+- Deploy jobs для staging и production на push-событиях.
 
-## Learning Laravel
+## Архитектура
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+В приложении есть один публичный маршрут: `GET /`. Его обрабатывает `HomeController`: загружает опубликованные проекты, eager-load'ит изображения и технологии, сортирует проекты по `published_at` в порядке убывания, ограничивает выборку шестью записями и передаёт данные в Inertia-страницу `Home/Index` через `ProjectCardResource`.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Отдельные service/repository-слои не добавлены, потому что текущий функционал небольшой. Для этого масштаба достаточно Eloquent-моделей, ресурсов, миграций, фабрик, сидеров и feature-тестов.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## База данных
 
-## Agentic Development
+Основные сущности:
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- `projects`: название, slug, описание, опциональные ссылки на сайт и репозиторий, дата публикации.
+- `project_images`: storage-relative путь к изображению, alt-текст, порядок сортировки, связь с проектом.
+- `technologies`: уникальные название и slug технологии.
+- `project_technology`: pivot-таблица между проектами и технологиями.
+
+Индексы и ограничения:
+
+- `projects.slug` уникален.
+- `projects.published_at` индексирован для запроса главной страницы.
+- `project_images` удаляются каскадно вместе с проектом.
+- `project_images` имеет unique-ограничение `(project_id, sort_order)`.
+- `project_technology` использует составной primary key и каскадное удаление.
+
+## Работа с данными
+
+Запрос главной страницы заранее загружает связи `images` и `technologies` до преобразования данных ресурсом. Это упрощает `ProjectCardResource` и предотвращает N+1-запросы при рендеринге карточек проектов.
+
+## Локальный запуск
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan storage:link
+npm run dev
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Production-сборка фронтенда:
 
-## Contributing
+```bash
+npm run build
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Тесты и проверки
 
-## Code of Conduct
+```bash
+composer validate --strict
+vendor/bin/pint --test
+php artisan test
+npm run build
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Автоформатирование через Pint:
 
-## Security Vulnerabilities
+```bash
+vendor/bin/pint
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Тесты используют SQLite in-memory базу и отключают Vite через стандартный Laravel-хелпер `withoutVite()`, поэтому `php artisan test` работает на fresh checkout без предварительного `npm run build` и без закоммиченных build-артефактов.
 
-## License
+## CI/CD
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+GitHub Actions запускает проверки на pull request и push в ветки `main` и `develop`. Job `tests` валидирует Composer-конфигурацию, проверяет PHP-стиль через Pint, устанавливает Node-зависимости, собирает frontend, проверяет build-артефакты и запускает PHP-тесты.
+
+Push-события также могут запускать deploy:
+
+- `develop` деплоится на staging.
+- `main` деплоится на production.
+
+Deploy jobs используют frontend build artifact, созданный в test job.

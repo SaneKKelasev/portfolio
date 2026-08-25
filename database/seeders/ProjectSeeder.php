@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Project;
+use App\Models\Technology;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -20,35 +21,35 @@ final class ProjectSeeder extends Seeder
      */
     private const IMAGES = [
         [
-            'filename'      => 'cover.webp',
-            'alt'           => 'Главная страница PortfolioHub',
-            'sort_order'    => 1,
+            'filename' => 'cover.webp',
+            'alt' => 'Главная страница PortfolioHub',
+            'sort_order' => 1,
         ],
         [
-            'filename'      => 'gallery-1.webp',
-            'alt'           => 'Страница проекта PortfolioHub',
-            'sort_order'    => 2,
+            'filename' => 'gallery-1.webp',
+            'alt' => 'Страница проекта PortfolioHub',
+            'sort_order' => 2,
         ],
         [
-            'filename'      => 'gallery-2.webp',
-            'alt'           => 'Административная панель PortfolioHub',
-            'sort_order'    => 3,
+            'filename' => 'gallery-2.webp',
+            'alt' => 'Административная панель PortfolioHub',
+            'sort_order' => 3,
         ],
         [
-            'filename'      => 'gallery-3.webp',
-            'alt'           => 'Редактирование проекта PortfolioHub',
-            'sort_order'    => 4,
+            'filename' => 'gallery-3.webp',
+            'alt' => 'Редактирование проекта PortfolioHub',
+            'sort_order' => 4,
         ],
         [
-            'filename'      => 'gallery-4.webp',
-            'alt'           => 'Адаптивная версия PortfolioHub',
-            'sort_order'    => 5,
+            'filename' => 'gallery-4.webp',
+            'alt' => 'Адаптивная версия PortfolioHub',
+            'sort_order' => 5,
         ],
     ];
 
     public function run(): void
     {
-        $technologyIds = \App\Models\Technology::query()
+        $technologyIds = Technology::query()
             ->whereIn('slug', [
                 'php',
                 'laravel',
@@ -63,10 +64,10 @@ final class ProjectSeeder extends Seeder
         ]);
 
         $project->fill([
-            'title'             => 'PortfolioHub',
-            'description'       => 'Платформа для публикации проектов и демонстрации профессионального портфолио.',
-            'website_url'       => 'https://portfoliohub.ru',
-            'repository_url'    => 'https://github.com/SaneKKelasev/portfolio',
+            'title' => 'PortfolioHub',
+            'description' => 'Платформа для публикации проектов и демонстрации профессионального портфолио.',
+            'website_url' => 'https://portfoliohub.ru',
+            'repository_url' => 'https://github.com/SaneKKelasev/portfolio',
         ]);
 
         /*

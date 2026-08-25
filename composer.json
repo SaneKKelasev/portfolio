@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "sanekkelasev/portfoliohub",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "A Laravel and Inertia portfolio application for publishing project cards with galleries and technologies.",
+    "keywords": ["portfolio", "laravel", "inertia", "vue"],
     "license": "MIT",
     "require": {
         "php": "^8.3",

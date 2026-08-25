@@ -1,6 +1,7 @@
 <script setup>
 import ProjectGallery from '@/Components/Project/Gallery.vue';
 import TechnologyBadge from '@/Components/Project/TechnologyBadge.vue';
+import { Link } from '@inertiajs/vue3';
 
 defineProps({
     project: {
@@ -68,16 +69,25 @@ defineProps({
                 </ul>
 
                 <div class="mt-8 flex flex-wrap items-center gap-5">
-                    <a
-                        v-if="project.website_url"
-                        :href="project.website_url"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <Link
+                        :href="`/projects/${project.slug}`"
                         class="inline-flex items-center gap-2 rounded-full
                                bg-primary px-5 py-3 text-sm font-semibold
                                text-white shadow-lg shadow-primary/25
                                transition hover:-translate-y-0.5
                                hover:bg-violet-500"
+                    >
+                        Подробнее
+                    </Link>
+
+                    <a
+                        v-if="project.website_url"
+                        :href="project.website_url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-2 text-sm
+                               font-semibold text-violet-200 transition
+                               hover:text-white"
                     >
                         Открыть сайт
                         <span aria-hidden="true">↗</span>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\ProjectFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -19,9 +20,16 @@ final class Project extends Model
         'title',
         'slug',
         'description',
+        'role',
+        'problem',
+        'solution',
+        'result',
         'website_url',
         'repository_url',
+        'started_at',
+        'finished_at',
         'published_at',
+        'sort_order',
     ];
 
     /**
@@ -30,8 +38,52 @@ final class Project extends Model
     protected function casts(): array
     {
         return [
+            'started_at' => 'date',
+            'finished_at' => 'date',
             'published_at' => 'datetime',
         ];
+    }
+
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->whereNotNull('published_at');
+    }
+
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public function scopeSearch(Builder $query, ?string $search): Builder
+    {
+        if ($search === null) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $query) use ($search): void {
+            $query
+                ->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+        });
+    }
+
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public function scopeWithTechnology(Builder $query, ?string $technology): Builder
+    {
+        if ($technology === null) {
+            return $query;
+        }
+
+        return $query->whereHas(
+            'technologies',
+            static fn (Builder $query): Builder => $query->where('slug', $technology),
+        );
     }
 
     /**

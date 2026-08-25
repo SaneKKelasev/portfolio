@@ -92,3 +92,83 @@ npm run build
 - Не добавляли auth/admin panel.
 - Не добавляли новые крупные зависимости.
 - Не меняли deploy pipeline сверх добавления Pint check.
+
+## Roadmap Progress
+
+### 1. Страница Детального Проекта
+
+Сделано:
+- добавлен route `GET /projects/{project:slug}`;
+- добавлен controller для detail page;
+- добавлен `ProjectDetailResource`;
+- detail page показывает только published проекты;
+- draft projects возвращают 404;
+- detail page получает images, technologies, ссылки и case-study поля;
+- добавлена Inertia-страница `Projects/Show.vue`;
+- карточки проектов ведут на detail page;
+- добавлены feature tests для detail page.
+
+### 2. Каталог Всех Проектов
+
+Сделано:
+- добавлен route `GET /projects`;
+- добавлен controller каталога;
+- каталог показывает published проекты;
+- сортировка идёт по `published_at DESC`;
+- добавлена pagination-структура;
+- добавлена Inertia-страница `Projects/Index.vue`;
+- главная получила ссылку на каталог;
+- добавлены feature tests для каталога.
+
+### 3. Фильтрация По Технологиям
+
+Сделано:
+- добавлен query param `technology`;
+- фильтр реализован через `whereHas('technologies')`;
+- список технологий передаётся в каталог;
+- frontend показывает technology chips с активным состоянием;
+- добавлены feature tests для фильтра.
+
+### 4. Поиск По Проектам
+
+Сделано:
+- добавлен query param `search`;
+- поиск работает по `title` и `description`;
+- поиск комбинируется с текущей структурой каталога;
+- frontend показывает search input с Inertia-переходом;
+- добавлены feature tests для поиска.
+
+### 5. Расширенная Модель Проекта
+
+Сделано:
+- добавлены case-study поля проекта: `role`, `problem`, `solution`, `result`, `started_at`, `finished_at`, `sort_order`;
+- обновлены `Project` fillable/casts;
+- обновлены factories;
+- обновлены seeders;
+- detail page отображает задачу, решение и результат.
+
+### 6. Контактная Форма
+
+Сделано:
+- добавлена таблица `contact_messages`;
+- добавлена модель `ContactMessage`;
+- добавлен `StoreContactMessageRequest`;
+- добавлен `ContactMessageController`;
+- форма сохраняет сообщение в БД;
+- frontend показывает validation errors, processing state и success message;
+- добавлены feature tests для успешной отправки и validation errors.
+
+### 7. SEO И Meta
+
+Сделано:
+- home, catalog и detail pages получают `meta`;
+- Vue-страницы используют Inertia `Head`;
+- title и description отличаются по странице.
+
+### 8. Улучшение Seed Data
+
+Сделано:
+- сидер PortfolioHub расширен case-study полями;
+- добавлены дополнительные демо-проекты `TaskFlow` и `MetricBoard`;
+- сидер остаётся идемпотентным через `updateOrCreate`;
+- technology sync сохранён.

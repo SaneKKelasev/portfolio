@@ -1,15 +1,27 @@
 <script setup>
+import ContactForm from '@/Components/Contact/Form.vue';
 import ProjectCard from '@/Components/Project/Card.vue';
+import { Head, Link } from '@inertiajs/vue3';
 
 defineProps({
     projects: {
         type: Array,
         required: true,
     },
+
+    meta: {
+        type: Object,
+        required: true,
+    },
 });
 </script>
 
 <template>
+    <Head>
+        <title>{{ meta.title }}</title>
+        <meta name="description" :content="meta.description">
+    </Head>
+
     <main class="relative min-h-screen overflow-hidden bg-background">
         <div
             class="pointer-events-none absolute inset-x-0 top-0 h-[42rem]
@@ -94,6 +106,19 @@ defineProps({
                     :reverse="index % 2 === 1"
                 />
             </div>
+
+            <div class="mt-10 flex justify-center">
+                <Link
+                    href="/projects"
+                    class="inline-flex rounded-full border border-border-bright/70
+                           px-6 py-3 text-sm font-semibold text-text-muted
+                           transition hover:border-accent/70 hover:text-white"
+                >
+                    Смотреть все проекты
+                </Link>
+            </div>
         </section>
+
+        <ContactForm />
     </main>
 </template>

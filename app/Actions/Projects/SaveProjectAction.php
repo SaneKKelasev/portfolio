@@ -19,6 +19,7 @@ final class SaveProjectAction
      * @param  list<int>  $technologyIds
      * @param  list<array{path: string, alt?: string|null, sort_order: int}>  $images
      * @param  list<UploadedFile>  $uploadedImages
+     * @param  list<array{alt?: string|null, sort_order: int}>  $uploadedImageMeta
      */
     public function execute(
         Project $project,
@@ -26,24 +27,26 @@ final class SaveProjectAction
         array $technologyIds,
         array $images,
         array $uploadedImages = [],
+        array $uploadedImageMeta = [],
     ): Project {
         $storedPaths = [];
 
         try {
-            return DB::transaction(function () use ($project, $data, $technologyIds, $images, $uploadedImages, &$storedPaths): Project {
+            return DB::transaction(function () use ($project, $data, $technologyIds, $images, $uploadedImages, $uploadedImageMeta, &$storedPaths): Project {
                 $project->fill($data);
                 $project->save();
 
                 $project->technologies()->sync($technologyIds);
 
-                foreach ($uploadedImages as $file) {
+                foreach ($uploadedImages as $index => $file) {
                     $path = $this->storeUploadedImage($project, $file);
                     $storedPaths[] = $path;
+                    $meta = $uploadedImageMeta[$index] ?? [];
 
                     $images[] = [
                         'path' => $path,
-                        'alt' => $this->imageAlt($file),
-                        'sort_order' => $this->nextImageSortOrder($images),
+                        'alt' => $meta['alt'] ?? $this->imageAlt($file),
+                        'sort_order' => $meta['sort_order'] ?? $this->nextImageSortOrder($images),
                     ];
                 }
 

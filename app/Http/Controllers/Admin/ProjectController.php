@@ -54,6 +54,7 @@ final class ProjectController extends Controller
             $request->technologyIds(),
             $request->images(),
             $request->uploadedImages(),
+            $request->uploadedImageMeta(),
         );
 
         return redirect("/admin/projects/{$project->id}/edit")
@@ -89,6 +90,7 @@ final class ProjectController extends Controller
             $request->technologyIds(),
             $request->images(),
             $request->uploadedImages(),
+            $request->uploadedImageMeta(),
         );
 
         return back()->with('success', 'Проект обновлён.');

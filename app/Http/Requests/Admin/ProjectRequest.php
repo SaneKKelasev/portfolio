@@ -132,6 +132,21 @@ final class ProjectRequest extends FormRequest
                 'mimes:jpg,jpeg,png,webp',
                 'max:4096',
             ],
+            'uploaded_images_meta' => [
+                'array',
+                'max:8',
+            ],
+            'uploaded_images_meta.*.alt' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+            'uploaded_images_meta.*.sort_order' => [
+                'required_with:uploaded_images.*',
+                'integer',
+                'min:1',
+                'max:10000',
+            ],
         ];
     }
 
@@ -146,6 +161,28 @@ final class ProjectRequest extends FormRequest
                 $validator->errors()->add(
                     'uploaded_images',
                     'У проекта может быть не больше 8 изображений.',
+                );
+            }
+
+            $uploadedImageMeta = $this->input('uploaded_images_meta', []);
+            $uploadedImageMeta = is_array($uploadedImageMeta) ? $uploadedImageMeta : [];
+
+            if ($uploadedImages !== count($uploadedImageMeta)) {
+                $validator->errors()->add(
+                    'uploaded_images',
+                    'Для каждого изображения должны быть переданы данные галереи.',
+                );
+            }
+
+            $sortOrders = [
+                ...collect($images)->pluck('sort_order')->filter()->all(),
+                ...collect($uploadedImageMeta)->pluck('sort_order')->filter()->all(),
+            ];
+
+            if (count($sortOrders) !== count(array_unique($sortOrders))) {
+                $validator->errors()->add(
+                    'uploaded_images',
+                    'Порядок изображений не должен повторяться.',
                 );
             }
         });
@@ -208,6 +245,14 @@ final class ProjectRequest extends FormRequest
         }
 
         return array_values($files);
+    }
+
+    /**
+     * @return list<array{alt?: string|null, sort_order: int}>
+     */
+    public function uploadedImageMeta(): array
+    {
+        return array_values($this->validated('uploaded_images_meta', []));
     }
 
     private function nextSortOrder(): int

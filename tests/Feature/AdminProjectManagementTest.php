@@ -56,7 +56,6 @@ final class AdminProjectManagementTest extends TestCase
         $this->actingAs($this->user)
             ->post('/admin/projects', [
                 'title' => 'Admin Project',
-                'slug' => 'admin-project',
                 'description' => 'Project created from admin panel.',
                 'problem' => 'Need a CRUD demo.',
                 'solution' => 'Use Laravel validation and transactions.',
@@ -127,7 +126,6 @@ final class AdminProjectManagementTest extends TestCase
         $this->actingAs($this->user)
             ->put("/admin/projects/{$project->id}", [
                 'title' => 'Updated title',
-                'slug' => 'updated-title',
                 'description' => 'Updated description.',
                 'role' => null,
                 'problem' => null,
@@ -185,21 +183,36 @@ final class AdminProjectManagementTest extends TestCase
         $this->actingAs($this->user)
             ->post('/admin/projects', [
                 'title' => 'Uploaded Project',
-                'slug' => 'uploaded-project',
                 'description' => 'Project with uploaded images.',
                 'published' => true,
                 'uploaded_images' => [
+                    UploadedFile::fake()->image('detail-view.jpg', 1200, 800),
                     UploadedFile::fake()->image('admin-cover.jpg', 1200, 800),
+                ],
+                'uploaded_images_meta' => [
+                    [
+                        'alt' => 'Detail view',
+                        'sort_order' => 1,
+                    ],
+                    [
+                        'alt' => 'Cover image',
+                        'sort_order' => 2,
+                    ],
                 ],
             ])
             ->assertRedirect();
 
         $project = Project::query()->where('slug', 'uploaded-project')->firstOrFail();
-        $image = $project->images()->firstOrFail();
+        $images = $project->images()->get();
 
-        $this->assertSame(1, $image->sort_order);
-        $this->assertStringStartsWith('projects/uploaded-project/admin-cover-', $image->path);
-        Storage::disk('public')->assertExists($image->path);
+        $this->assertCount(2, $images);
+        $this->assertSame('Detail view', $images[0]->alt);
+        $this->assertSame(1, $images[0]->sort_order);
+        $this->assertSame('Cover image', $images[1]->alt);
+        $this->assertSame(2, $images[1]->sort_order);
+        $this->assertStringStartsWith('projects/uploaded-project/detail-view-', $images[0]->path);
+        Storage::disk('public')->assertExists($images[0]->path);
+        Storage::disk('public')->assertExists($images[1]->path);
     }
 
     public function test_admin_cannot_modify_protected_project(): void

@@ -24,10 +24,11 @@ const page = usePage();
 const successMessage = computed(() => page.props.flash?.success ?? null);
 const isEditing = computed(() => props.project.id !== null);
 const uploadInput = ref(null);
+const isDragging = ref(false);
+let uploadedImageId = 0;
 
 const form = useForm({
     title: props.project.title ?? '',
-    slug: props.project.slug ?? '',
     description: props.project.description ?? '',
     problem: props.project.problem ?? '',
     solution: props.project.solution ?? '',
@@ -38,9 +39,19 @@ const form = useForm({
     finished_at: props.project.finished_at ?? '',
     published: props.project.published ?? false,
     technologies: props.project.technologies ?? [],
-    images: props.project.images ?? [],
+    images: [],
     uploaded_images: [],
+    uploaded_images_meta: [],
 });
+
+const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
+    id: `existing-${image.path}`,
+    type: 'existing',
+    path: image.path,
+    url: image.url,
+    alt: image.alt ?? '',
+    sort_order: image.sort_order ?? index + 1,
+})));
 
 const uploadErrors = computed(() => Object.entries(form.errors)
     .filter(([key]) => key.startsWith('uploaded_images'))
@@ -56,18 +67,103 @@ function toggleTechnology(id) {
 }
 
 function removeImage(index) {
-    form.images.splice(index, 1);
+    const [item] = galleryItems.value.splice(index, 1);
+
+    if (item?.type === 'upload' && item.preview) {
+        URL.revokeObjectURL(item.preview);
+    }
+}
+
+function addFiles(files) {
+    Array.from(files)
+        .filter((file) => file.type.startsWith('image/'))
+        .forEach((file) => {
+            uploadedImageId += 1;
+            galleryItems.value.push({
+                id: `upload-${uploadedImageId}`,
+                type: 'upload',
+                file,
+                preview: URL.createObjectURL(file),
+                alt: file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' '),
+            });
+        });
 }
 
 function selectUploads(event) {
-    form.uploaded_images = Array.from(event.target.files ?? []);
+    addFiles(event.target.files ?? []);
+
+    if (uploadInput.value) {
+        uploadInput.value.value = '';
+    }
+}
+
+function openUploadDialog() {
+    uploadInput.value?.click();
+}
+
+function dropUploads(event) {
+    isDragging.value = false;
+    addFiles(event.dataTransfer.files ?? []);
+}
+
+function moveImage(index, direction) {
+    const nextIndex = index + direction;
+
+    if (nextIndex < 0 || nextIndex >= galleryItems.value.length) {
+        return;
+    }
+
+    const items = [...galleryItems.value];
+    [items[index], items[nextIndex]] = [items[nextIndex], items[index]];
+    galleryItems.value = items;
+}
+
+function makeCover(index) {
+    if (index === 0) {
+        return;
+    }
+
+    const items = [...galleryItems.value];
+    const [item] = items.splice(index, 1);
+    items.unshift(item);
+    galleryItems.value = items;
 }
 
 function normalizedImages(images) {
     return images.filter((image) => (image.path ?? '').trim() !== '');
 }
 
+function syncGalleryPayload() {
+    const existingImages = [];
+    const uploadedImages = [];
+    const uploadedImagesMeta = [];
+
+    galleryItems.value.forEach((item, index) => {
+        const imageData = {
+            alt: item.alt,
+            sort_order: index + 1,
+        };
+
+        if (item.type === 'existing') {
+            existingImages.push({
+                ...imageData,
+                path: item.path,
+            });
+            return;
+        }
+
+        uploadedImages.push(item.file);
+        uploadedImagesMeta.push(imageData);
+    });
+
+    form.images = existingImages;
+    form.uploaded_images = uploadedImages;
+    form.uploaded_images_meta = uploadedImagesMeta;
+}
+
 function submit() {
+    syncGalleryPayload();
+
     form.transform((data) => ({
         ...data,
         images: normalizedImages(data.images),
@@ -80,6 +176,7 @@ function submit() {
             preserveScroll: true,
             onSuccess: () => {
                 form.uploaded_images = [];
+                form.uploaded_images_meta = [];
                 if (uploadInput.value) {
                     uploadInput.value.value = '';
                 }
@@ -128,7 +225,7 @@ function submit() {
                 class="grid gap-5 rounded-3xl border border-border
                        bg-surface/75 p-6 lg:grid-cols-2"
             >
-                <label class="block">
+                <label class="block lg:col-span-2">
                     <span class="text-sm font-semibold text-text">Название</span>
                     <input
                         v-model="form.title"
@@ -139,18 +236,8 @@ function submit() {
                     <span v-if="form.errors.title" class="mt-2 block text-sm text-rose-300">
                         {{ form.errors.title }}
                     </span>
-                </label>
-
-                <label class="block">
-                    <span class="text-sm font-semibold text-text">Slug</span>
-                    <input
-                        v-model="form.slug"
-                        class="mt-2 w-full rounded-2xl border border-border
-                               bg-background/70 px-4 py-3 text-text outline-none
-                               focus:border-accent"
-                    >
                     <span v-if="form.errors.slug" class="mt-2 block text-sm text-rose-300">
-                        {{ form.errors.slug }}
+                        URL-адрес для этого названия уже занят.
                     </span>
                 </label>
 
@@ -273,42 +360,38 @@ function submit() {
                 <div
                     class="mt-5 rounded-2xl border border-dashed border-border-bright/60
                            bg-background/45 p-4"
+                    :class="isDragging ? 'border-accent bg-accent/10' : ''"
+                    @dragenter.prevent="isDragging = true"
+                    @dragover.prevent="isDragging = true"
+                    @dragleave.prevent="isDragging = false"
+                    @drop.prevent="dropUploads"
                 >
-                    <label class="block">
-                        <span class="text-sm font-semibold text-text">
-                            Загрузить изображения
-                        </span>
+                    <div class="block">
+                        <p class="text-sm font-semibold text-text">
+                            Перетащите изображения сюда или выберите файлы
+                        </p>
                         <input
                             ref="uploadInput"
                             type="file"
                             multiple
                             accept="image/png,image/jpeg,image/webp"
-                            class="mt-3 block w-full text-sm text-text-muted
-                                   file:mr-4 file:rounded-full file:border-0
-                                   file:bg-primary file:px-4 file:py-2
-                                   file:text-sm file:font-semibold file:text-white
-                                   hover:file:bg-violet-500"
+                            class="sr-only"
                             @change="selectUploads"
                         >
-                    </label>
+                        <button
+                            type="button"
+                            class="mt-4 rounded-full bg-primary px-5 py-3
+                                   text-sm font-semibold text-white shadow-lg
+                                   shadow-primary/25 transition hover:bg-violet-500"
+                            @click="openUploadDialog"
+                        >
+                            Выбрать изображения
+                        </button>
+                    </div>
 
                     <p class="mt-3 text-sm text-text-muted">
-                        Файлы сохранятся автоматически, а приложение само подставит их в галерею проекта.
+                        Можно выбрать несколько файлов сразу или добавлять их по одному. Первое изображение в списке станет главным.
                     </p>
-
-                    <div
-                        v-if="form.uploaded_images.length > 0"
-                        class="mt-3 flex flex-wrap gap-2"
-                    >
-                        <span
-                            v-for="file in form.uploaded_images"
-                            :key="file.name"
-                            class="rounded-full border border-border-bright/60 px-3 py-1
-                                   text-xs font-semibold text-text"
-                        >
-                            {{ file.name }}
-                        </span>
-                    </div>
 
                     <p
                         v-if="form.errors.uploaded_images"
@@ -328,8 +411,8 @@ function submit() {
 
                 <div class="mt-4 space-y-4">
                     <div
-                        v-for="(image, index) in form.images"
-                        :key="index"
+                        v-for="(image, index) in galleryItems"
+                        :key="image.id"
                         class="grid gap-3 rounded-2xl border border-border p-4
                                lg:grid-cols-[10rem_1fr_auto]"
                     >
@@ -338,17 +421,49 @@ function submit() {
                                    border border-border bg-background/70"
                         >
                             <img
-                                v-if="image.url"
-                                :src="image.url"
+                                :src="image.url ?? image.preview"
                                 :alt="image.alt || 'Изображение проекта'"
                                 class="h-full w-full object-cover"
                             >
                         </div>
-                        <input v-model="image.alt" placeholder="Описание изображения" class="rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent">
-                        <button type="button" class="text-sm font-semibold text-rose-300" @click="removeImage(index)">
-                            Удалить
-                        </button>
+                        <div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span
+                                    v-if="index === 0"
+                                    class="rounded-full border border-accent/60 px-3 py-1
+                                           text-xs font-semibold text-accent"
+                                >
+                                    Главное
+                                </span>
+                                <span class="text-xs font-semibold text-text-muted">
+                                    #{{ index + 1 }}
+                                </span>
+                            </div>
+                            <input v-model="image.alt" placeholder="Описание изображения" class="mt-3 w-full rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent">
+                        </div>
+                        <div class="flex flex-wrap items-center justify-end gap-2">
+                            <button type="button" class="rounded-full border border-border px-3 py-2 text-xs font-semibold text-text-muted transition hover:border-accent/70 hover:text-white" @click="makeCover(index)">
+                                Главная
+                            </button>
+                            <button type="button" :disabled="index === 0" class="rounded-full border border-border px-3 py-2 text-xs font-semibold text-text-muted transition enabled:hover:border-accent/70 enabled:hover:text-white disabled:opacity-40" @click="moveImage(index, -1)">
+                                Вверх
+                            </button>
+                            <button type="button" :disabled="index === galleryItems.length - 1" class="rounded-full border border-border px-3 py-2 text-xs font-semibold text-text-muted transition enabled:hover:border-accent/70 enabled:hover:text-white disabled:opacity-40" @click="moveImage(index, 1)">
+                                Вниз
+                            </button>
+                            <button type="button" class="rounded-full border border-rose-400/50 px-3 py-2 text-xs font-semibold text-rose-300 transition hover:border-rose-300 hover:text-rose-200" @click="removeImage(index)">
+                                Удалить
+                            </button>
+                        </div>
                     </div>
+
+                    <p
+                        v-if="galleryItems.length === 0"
+                        class="rounded-2xl border border-border bg-background/45
+                               p-5 text-sm text-text-muted"
+                    >
+                        Изображений пока нет. Добавьте одно или несколько изображений выше.
+                    </p>
                 </div>
             </section>
 

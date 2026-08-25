@@ -7,7 +7,12 @@
         content="width=device-width, initial-scale=1"
     >
 
-    <title inertia>{{ config('app.name', 'PortfolioHub') }}</title>
+    <title inertia>PortfolioHub</title>
+    <link
+        rel="icon"
+        href="/favicon.svg"
+        type="image/svg+xml"
+    >
 
     @vite('resources/js/app.js')
     @inertiaHead

@@ -22,9 +22,9 @@ defineProps({
         />
 
         <section
-            class="mx-auto w-full max-w-7xl px-5 py-14
-                   sm:px-8 sm:py-16
-                   lg:px-10 lg:py-20"
+            class="mx-auto w-full max-w-7xl px-5 py-12
+                   sm:px-8 sm:py-14
+                   lg:px-10 lg:py-16"
         >
             <header
                 class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_26rem]
@@ -60,35 +60,33 @@ defineProps({
 
                 <div
                     class="grid grid-cols-3 overflow-hidden rounded-2xl border
-                           border-border bg-surface/70 shadow-2xl
+                           border-border bg-surface/75 shadow-2xl
                            shadow-black/30 backdrop-blur"
                 >
                     <div class="border-r border-border p-5">
-                        <p class="text-2xl font-semibold text-text">
-                            {{ projects.length }}
-                        </p>
-                        <p class="mt-1 text-xs uppercase tracking-wide text-text-muted">
-                            проектов
-                        </p>
-                    </div>
-
-                    <div class="border-r border-border p-5">
-                        <p class="text-2xl font-semibold text-accent">PHP</p>
+                        <p class="text-2xl font-semibold text-text">Laravel</p>
                         <p class="mt-1 text-xs uppercase tracking-wide text-text-muted">
                             backend
                         </p>
                     </div>
 
-                    <div class="p-5">
-                        <p class="text-2xl font-semibold text-success">CI</p>
+                    <div class="border-r border-border p-5">
+                        <p class="text-2xl font-semibold text-accent">Vue</p>
                         <p class="mt-1 text-xs uppercase tracking-wide text-text-muted">
-                            checks
+                            inertia
+                        </p>
+                    </div>
+
+                    <div class="p-5">
+                        <p class="text-2xl font-semibold text-success">Tests</p>
+                        <p class="mt-1 text-xs uppercase tracking-wide text-text-muted">
+                            ci ready
                         </p>
                     </div>
                 </div>
             </header>
 
-            <div class="mt-12 space-y-8 sm:mt-14 lg:space-y-10">
+            <div class="mt-10 space-y-8 sm:mt-12 lg:space-y-10">
                 <ProjectCard
                     v-for="(project, index) in projects"
                     :key="project.id"

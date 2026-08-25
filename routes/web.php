@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\Admin\TechnologyController as AdminTechnologyController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\HomeController;
@@ -34,6 +35,10 @@ Route::middleware('auth')
         Route::get('/projects/{project}/edit', [AdminProjectController::class, 'edit']);
         Route::put('/projects/{project}', [AdminProjectController::class, 'update']);
         Route::delete('/projects/{project}', [AdminProjectController::class, 'destroy']);
+        Route::get('/technologies', [AdminTechnologyController::class, 'index']);
+        Route::post('/technologies', [AdminTechnologyController::class, 'store']);
+        Route::put('/technologies/{technology}', [AdminTechnologyController::class, 'update']);
+        Route::delete('/technologies/{technology}', [AdminTechnologyController::class, 'destroy']);
         Route::get('/contact-messages', [AdminContactMessageController::class, 'index']);
         Route::get('/contact-messages/{contactMessage}', [AdminContactMessageController::class, 'show']);
         Route::patch('/contact-messages/{contactMessage}/read', [AdminContactMessageController::class, 'markAsRead']);

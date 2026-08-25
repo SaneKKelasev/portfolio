@@ -58,7 +58,6 @@ final class AdminProjectManagementTest extends TestCase
                 'title' => 'Admin Project',
                 'slug' => 'admin-project',
                 'description' => 'Project created from admin panel.',
-                'role' => 'Fullstack developer',
                 'problem' => 'Need a CRUD demo.',
                 'solution' => 'Use Laravel validation and transactions.',
                 'result' => 'Project saved atomically.',
@@ -67,7 +66,6 @@ final class AdminProjectManagementTest extends TestCase
                 'started_at' => '2026-01-01',
                 'finished_at' => '2026-02-01',
                 'published' => true,
-                'sort_order' => 10,
                 'technologies' => [
                     $technology->id,
                 ],
@@ -190,7 +188,6 @@ final class AdminProjectManagementTest extends TestCase
                 'slug' => 'uploaded-project',
                 'description' => 'Project with uploaded images.',
                 'published' => true,
-                'sort_order' => 30,
                 'uploaded_images' => [
                     UploadedFile::fake()->image('admin-cover.jpg', 1200, 800),
                 ],
@@ -222,7 +219,6 @@ final class AdminProjectManagementTest extends TestCase
                 'slug' => 'protected-project',
                 'description' => 'Updated description.',
                 'published' => true,
-                'sort_order' => 1,
             ])
             ->assertForbidden();
 

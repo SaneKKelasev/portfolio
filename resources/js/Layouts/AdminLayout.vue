@@ -39,6 +39,14 @@ function logout() {
                     Проекты
                 </Link>
                 <Link
+                    href="/admin/technologies"
+                    class="block rounded-2xl px-4 py-3 text-sm font-semibold
+                           text-text-muted transition hover:bg-white/[0.04]
+                           hover:text-white"
+                >
+                    Технологии
+                </Link>
+                <Link
                     href="/admin/contact-messages"
                     class="block rounded-2xl px-4 py-3 text-sm font-semibold
                            text-text-muted transition hover:bg-white/[0.04]

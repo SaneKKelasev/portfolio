@@ -29,7 +29,6 @@ const form = useForm({
     title: props.project.title ?? '',
     slug: props.project.slug ?? '',
     description: props.project.description ?? '',
-    role: props.project.role ?? '',
     problem: props.project.problem ?? '',
     solution: props.project.solution ?? '',
     result: props.project.result ?? '',
@@ -38,7 +37,6 @@ const form = useForm({
     started_at: props.project.started_at ?? '',
     finished_at: props.project.finished_at ?? '',
     published: props.project.published ?? false,
-    sort_order: props.project.sort_order ?? 100,
     technologies: props.project.technologies ?? [],
     images: props.project.images ?? [],
     uploaded_images: [],
@@ -171,27 +169,6 @@ function submit() {
                 </label>
 
                 <label class="block">
-                    <span class="text-sm font-semibold text-text">Роль</span>
-                    <input
-                        v-model="form.role"
-                        class="mt-2 w-full rounded-2xl border border-border
-                               bg-background/70 px-4 py-3 text-text outline-none
-                               focus:border-accent"
-                    >
-                </label>
-
-                <label class="block">
-                    <span class="text-sm font-semibold text-text">Порядок</span>
-                    <input
-                        v-model="form.sort_order"
-                        type="number"
-                        class="mt-2 w-full rounded-2xl border border-border
-                               bg-background/70 px-4 py-3 text-text outline-none
-                               focus:border-accent"
-                    >
-                </label>
-
-                <label class="block">
                     <span class="text-sm font-semibold text-text">Сайт</span>
                     <input
                         v-model="form.website_url"
@@ -260,7 +237,16 @@ function submit() {
             </section>
 
             <section class="rounded-3xl border border-border bg-surface/75 p-6">
-                <h2 class="text-xl font-semibold text-text">Технологии</h2>
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <h2 class="text-xl font-semibold text-text">Технологии</h2>
+                    <Link
+                        href="/admin/technologies"
+                        class="text-sm font-semibold text-accent transition
+                               hover:text-cyan-200"
+                    >
+                        Управлять технологиями
+                    </Link>
+                </div>
                 <div class="mt-4 flex flex-wrap gap-2">
                     <button
                         v-for="technology in technologies"
@@ -345,7 +331,7 @@ function submit() {
                         v-for="(image, index) in form.images"
                         :key="index"
                         class="grid gap-3 rounded-2xl border border-border p-4
-                               lg:grid-cols-[10rem_1fr_8rem_auto]"
+                               lg:grid-cols-[10rem_1fr_auto]"
                     >
                         <div
                             class="aspect-video overflow-hidden rounded-2xl
@@ -359,7 +345,6 @@ function submit() {
                             >
                         </div>
                         <input v-model="image.alt" placeholder="Описание изображения" class="rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent">
-                        <input v-model="image.sort_order" type="number" class="rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent">
                         <button type="button" class="text-sm font-semibold text-rose-300" @click="removeImage(index)">
                             Удалить
                         </button>

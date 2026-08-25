@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Project;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
@@ -12,6 +13,15 @@ use Illuminate\Validation\Validator;
 
 final class ProjectRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        if (! $this->filled('slug') && is_string($this->input('title'))) {
+            $this->merge([
+                'slug' => Str::slug($this->input('title')),
+            ]);
+        }
+    }
+
     /**
      * @return array<string, list<mixed>>
      */
@@ -79,7 +89,7 @@ final class ProjectRequest extends FormRequest
                 'boolean',
             ],
             'sort_order' => [
-                'required',
+                'nullable',
                 'integer',
                 'min:1',
                 'max:10000',
@@ -151,7 +161,7 @@ final class ProjectRequest extends FormRequest
 
         return [
             'title' => $validated['title'],
-            'slug' => $validated['slug'] ?: Str::slug($validated['title']),
+            'slug' => $validated['slug'],
             'description' => $validated['description'],
             'role' => $validated['role'] ?? null,
             'problem' => $validated['problem'] ?? null,
@@ -164,7 +174,9 @@ final class ProjectRequest extends FormRequest
             'published_at' => $this->boolean('published')
                 ? ($project?->published_at ?? now())
                 : null,
-            'sort_order' => $validated['sort_order'],
+            'sort_order' => $validated['sort_order']
+                ?? $project?->sort_order
+                ?? $this->nextSortOrder(),
         ];
     }
 
@@ -196,5 +208,12 @@ final class ProjectRequest extends FormRequest
         }
 
         return array_values($files);
+    }
+
+    private function nextSortOrder(): int
+    {
+        $maxSortOrder = Project::query()->max('sort_order');
+
+        return ((int) $maxSortOrder) + 10;
     }
 }

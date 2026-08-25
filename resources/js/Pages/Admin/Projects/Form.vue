@@ -40,9 +40,7 @@ const form = useForm({
     published: props.project.published ?? false,
     sort_order: props.project.sort_order ?? 100,
     technologies: props.project.technologies ?? [],
-    images: props.project.images.length > 0
-        ? props.project.images
-        : [{ path: '', alt: '', sort_order: 1 }],
+    images: props.project.images ?? [],
     uploaded_images: [],
 });
 
@@ -57,14 +55,6 @@ function toggleTechnology(id) {
     }
 
     form.technologies = [...form.technologies, id];
-}
-
-function addImage() {
-    form.images.push({
-        path: '',
-        alt: '',
-        sort_order: form.images.length + 1,
-    });
 }
 
 function removeImage(index) {
@@ -292,9 +282,6 @@ function submit() {
             <section class="rounded-3xl border border-border bg-surface/75 p-6">
                 <div class="flex items-center justify-between gap-4">
                     <h2 class="text-xl font-semibold text-text">Изображения</h2>
-                    <button type="button" class="text-sm font-semibold text-accent" @click="addImage">
-                        Добавить
-                    </button>
                 </div>
 
                 <div
@@ -320,7 +307,7 @@ function submit() {
                     </label>
 
                     <p class="mt-3 text-sm text-text-muted">
-                        Файлы сохранятся в public storage автоматически. Ручные пути ниже можно оставить для уже загруженных изображений.
+                        Файлы сохранятся автоматически, а приложение само подставит их в галерею проекта.
                     </p>
 
                     <div
@@ -358,10 +345,20 @@ function submit() {
                         v-for="(image, index) in form.images"
                         :key="index"
                         class="grid gap-3 rounded-2xl border border-border p-4
-                               lg:grid-cols-[1fr_1fr_8rem_auto]"
+                               lg:grid-cols-[10rem_1fr_8rem_auto]"
                     >
-                        <input v-model="image.path" placeholder="projects/name/cover.webp" class="rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent">
-                        <input v-model="image.alt" placeholder="Alt text" class="rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent">
+                        <div
+                            class="aspect-video overflow-hidden rounded-2xl
+                                   border border-border bg-background/70"
+                        >
+                            <img
+                                v-if="image.url"
+                                :src="image.url"
+                                :alt="image.alt || 'Изображение проекта'"
+                                class="h-full w-full object-cover"
+                            >
+                        </div>
+                        <input v-model="image.alt" placeholder="Описание изображения" class="rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent">
                         <input v-model="image.sort_order" type="number" class="rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent">
                         <button type="button" class="text-sm font-semibold text-rose-300" @click="removeImage(index)">
                             Удалить

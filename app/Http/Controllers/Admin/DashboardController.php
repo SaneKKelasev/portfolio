@@ -17,10 +17,22 @@ final class DashboardController extends Controller
     {
         return Inertia::render('Admin/Dashboard', [
             'stats' => [
-                'published_projects' => Project::query()->published()->count(),
-                'draft_projects' => Project::query()->whereNull('published_at')->count(),
-                'technologies' => Technology::query()->count(),
-                'unread_messages' => ContactMessage::query()->whereNull('read_at')->count(),
+                [
+                    'label' => 'Опубликовано',
+                    'value' => Project::query()->published()->count(),
+                ],
+                [
+                    'label' => 'Черновики',
+                    'value' => Project::query()->whereNull('published_at')->count(),
+                ],
+                [
+                    'label' => 'Технологии',
+                    'value' => Technology::query()->count(),
+                ],
+                [
+                    'label' => 'Новые сообщения',
+                    'value' => ContactMessage::query()->whereNull('read_at')->count(),
+                ],
             ],
             'latestMessages' => ContactMessage::query()
                 ->latest()
@@ -33,7 +45,7 @@ final class DashboardController extends Controller
                     'read_at',
                 ]),
             'meta' => [
-                'title' => 'Админка — PortfolioHub',
+                'title' => 'Панель управления — PortfolioHub',
                 'description' => 'Панель управления PortfolioHub.',
             ],
         ]);

@@ -80,6 +80,7 @@ final class ProjectSeeder extends Seeder
                 'finished_at' => now()->startOfMonth(),
                 'published_at' => now(),
                 'sort_order' => 1,
+                'is_protected' => true,
             ],
         );
 
@@ -142,6 +143,7 @@ final class ProjectSeeder extends Seeder
                 'finished_at' => now()->subMonths(5)->startOfMonth(),
                 'published_at' => now()->subDays(10),
                 'sort_order' => 2,
+                'is_protected' => true,
                 'technologies' => [
                     'php',
                     'laravel',
@@ -162,6 +164,7 @@ final class ProjectSeeder extends Seeder
                 'finished_at' => now()->subMonths(3)->startOfMonth(),
                 'published_at' => now()->subDays(20),
                 'sort_order' => 3,
+                'is_protected' => true,
                 'technologies' => [
                     'vue',
                     'inertia',

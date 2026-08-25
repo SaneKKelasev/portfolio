@@ -32,7 +32,7 @@ defineProps({
                 class="text-xs font-semibold uppercase tracking-[0.18em]
                        text-accent"
             >
-                Dashboard
+                Панель
             </p>
             <h1 class="mt-4 text-4xl font-semibold text-text">
                 Панель управления
@@ -41,13 +41,13 @@ defineProps({
 
         <section class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div
-                v-for="(value, label) in stats"
-                :key="label"
+                v-for="stat in stats"
+                :key="stat.label"
                 class="rounded-3xl border border-border bg-surface/75 p-6"
             >
-                <p class="text-3xl font-semibold text-text">{{ value }}</p>
+                <p class="text-3xl font-semibold text-text">{{ stat.value }}</p>
                 <p class="mt-2 text-sm uppercase tracking-wide text-text-muted">
-                    {{ label.replace('_', ' ') }}
+                    {{ stat.label }}
                 </p>
             </div>
         </section>

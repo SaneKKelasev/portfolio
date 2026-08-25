@@ -44,6 +44,7 @@ class ProjectFactory extends Factory
                 ? fake()->dateTimeBetween('-3 years', 'now')
                 : null,
             'sort_order' => fake()->numberBetween(1, 100),
+            'is_protected' => false,
         ];
     }
 }

@@ -19,7 +19,7 @@ function logout() {
             <Link href="/admin" class="text-2xl font-semibold text-text">
                 PortfolioHub
             </Link>
-            <p class="mt-1 text-sm text-text-muted">Admin panel</p>
+            <p class="mt-1 text-sm text-text-muted">Панель управления</p>
 
             <nav class="mt-10 space-y-2">
                 <Link
@@ -28,7 +28,7 @@ function logout() {
                            text-text-muted transition hover:bg-white/[0.04]
                            hover:text-white"
                 >
-                    Dashboard
+                    Главная
                 </Link>
                 <Link
                     href="/admin/projects"
@@ -36,7 +36,7 @@ function logout() {
                            text-text-muted transition hover:bg-white/[0.04]
                            hover:text-white"
                 >
-                    Projects
+                    Проекты
                 </Link>
                 <Link
                     href="/admin/contact-messages"
@@ -44,7 +44,7 @@ function logout() {
                            text-text-muted transition hover:bg-white/[0.04]
                            hover:text-white"
                 >
-                    Messages
+                    Сообщения
                 </Link>
             </nav>
 

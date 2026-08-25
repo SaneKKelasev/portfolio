@@ -30,6 +30,7 @@ final class Project extends Model
         'finished_at',
         'published_at',
         'sort_order',
+        'is_protected',
     ];
 
     /**
@@ -41,6 +42,7 @@ final class Project extends Model
             'started_at' => 'date',
             'finished_at' => 'date',
             'published_at' => 'datetime',
+            'is_protected' => 'boolean',
         ];
     }
 

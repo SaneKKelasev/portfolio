@@ -10,6 +10,7 @@ use App\Http\Requests\Admin\ProjectRequest;
 use App\Models\Project;
 use App\Models\Technology;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,7 +26,7 @@ final class ProjectController extends Controller
         return Inertia::render('Admin/Projects/Index', [
             'projects' => $projects->map(fn (Project $project): array => $this->projectRow($project)),
             'meta' => [
-                'title' => 'Проекты — Admin',
+                'title' => 'Проекты — Админка',
                 'description' => 'Управление проектами PortfolioHub.',
             ],
         ]);
@@ -39,7 +40,7 @@ final class ProjectController extends Controller
             ])),
             'technologies' => $this->technologies(),
             'meta' => [
-                'title' => 'Новый проект — Admin',
+                'title' => 'Новый проект — Админка',
                 'description' => 'Создание проекта PortfolioHub.',
             ],
         ]);
@@ -61,6 +62,8 @@ final class ProjectController extends Controller
 
     public function edit(Project $project): Response
     {
+        abort_if($project->is_protected, 403);
+
         $project->load([
             'images',
             'technologies',
@@ -70,7 +73,7 @@ final class ProjectController extends Controller
             'project' => $this->projectFormData($project),
             'technologies' => $this->technologies(),
             'meta' => [
-                'title' => "Редактирование {$project->title} — Admin",
+                'title' => "Редактирование {$project->title} — Админка",
                 'description' => 'Редактирование проекта PortfolioHub.',
             ],
         ]);
@@ -78,6 +81,8 @@ final class ProjectController extends Controller
 
     public function update(ProjectRequest $request, Project $project, SaveProjectAction $action): RedirectResponse
     {
+        abort_if($project->is_protected, 403);
+
         $action->execute(
             $project,
             $request->projectData(),
@@ -91,6 +96,8 @@ final class ProjectController extends Controller
 
     public function destroy(Project $project): RedirectResponse
     {
+        abort_if($project->is_protected, 403);
+
         $project->delete();
 
         return redirect('/admin/projects')
@@ -122,6 +129,7 @@ final class ProjectController extends Controller
             'title' => $project->title,
             'slug' => $project->slug,
             'published' => $project->published_at !== null,
+            'is_protected' => $project->is_protected,
             'updated_at' => $project->updated_at?->format('Y-m-d H:i'),
             'technologies' => $project->technologies->pluck('name')->all(),
         ];
@@ -146,10 +154,12 @@ final class ProjectController extends Controller
             'started_at' => $project->started_at?->format('Y-m-d'),
             'finished_at' => $project->finished_at?->format('Y-m-d'),
             'published' => $project->published_at !== null,
+            'is_protected' => $project->is_protected,
             'sort_order' => $project->sort_order ?? 100,
             'technologies' => $project->technologies?->pluck('id')->all() ?? [],
             'images' => $project->images?->map(fn ($image): array => [
                 'path' => $image->path,
+                'url' => Storage::disk('public')->url($image->path),
                 'alt' => $image->alt,
                 'sort_order' => $image->sort_order,
             ])->values()->all() ?? [],

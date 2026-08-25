@@ -19,6 +19,10 @@ const page = usePage();
 const successMessage = computed(() => page.props.flash?.success ?? null);
 
 function destroyProject(project) {
+    if (project.is_protected) {
+        return;
+    }
+
     if (confirm(`Удалить проект "${project.title}"?`)) {
         router.delete(`/admin/projects/${project.id}`);
     }
@@ -38,7 +42,7 @@ function destroyProject(project) {
                     class="text-xs font-semibold uppercase tracking-[0.18em]
                            text-accent"
                 >
-                    Projects
+                    Проекты
                 </p>
                 <h1 class="mt-4 text-4xl font-semibold text-text">
                     Управление проектами
@@ -87,7 +91,14 @@ function destroyProject(project) {
                                     : 'border-border-bright/60 text-text-muted'
                             "
                         >
-                            {{ project.published ? 'published' : 'draft' }}
+                            {{ project.published ? 'опубликован' : 'черновик' }}
+                        </span>
+                        <span
+                            v-if="project.is_protected"
+                            class="rounded-full border border-primary/50 px-3 py-1
+                                   text-xs font-semibold text-violet-200"
+                        >
+                            защищён
                         </span>
                     </div>
                     <p class="mt-2 text-sm text-text-muted">
@@ -108,6 +119,7 @@ function destroyProject(project) {
                         Открыть
                     </Link>
                     <Link
+                        v-if="!project.is_protected"
                         :href="`/admin/projects/${project.id}/edit`"
                         class="rounded-full border border-border px-4 py-2
                                text-sm font-semibold text-text-muted
@@ -115,7 +127,15 @@ function destroyProject(project) {
                     >
                         Редактировать
                     </Link>
+                    <span
+                        v-else
+                        class="rounded-full border border-border px-4 py-2
+                               text-sm font-semibold text-text-muted/70"
+                    >
+                        Только просмотр
+                    </span>
                     <button
+                        v-if="!project.is_protected"
                         type="button"
                         class="rounded-full border border-rose-400/50 px-4 py-2
                                text-sm font-semibold text-rose-300 transition

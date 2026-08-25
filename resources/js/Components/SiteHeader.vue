@@ -48,7 +48,7 @@ const adminHref = computed(() => (page.props.auth?.user ? '/admin' : '/login'));
                        shadow-lg shadow-primary/20 transition
                        hover:bg-violet-500"
             >
-                Admin demo
+                Админка
             </Link>
         </nav>
     </header>

@@ -21,7 +21,7 @@ final class ContactMessageController extends Controller
         return Inertia::render('Admin/ContactMessages/Index', [
             'messages' => $messages,
             'meta' => [
-                'title' => 'Сообщения — Admin',
+                'title' => 'Сообщения — Админка',
                 'description' => 'Сообщения из контактной формы PortfolioHub.',
             ],
         ]);
@@ -32,7 +32,7 @@ final class ContactMessageController extends Controller
         return Inertia::render('Admin/ContactMessages/Show', [
             'message' => $contactMessage,
             'meta' => [
-                'title' => "Сообщение от {$contactMessage->name} — Admin",
+                'title' => "Сообщение от {$contactMessage->name} — Админка",
                 'description' => 'Просмотр сообщения из контактной формы.',
             ],
         ]);

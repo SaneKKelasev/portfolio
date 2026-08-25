@@ -37,7 +37,7 @@ function submit() {
                 class="text-xs font-semibold uppercase tracking-[0.18em]
                        text-accent"
             >
-                Admin
+                Админка
             </p>
             <h1 class="mt-4 text-3xl font-semibold text-text">
                 Вход в панель

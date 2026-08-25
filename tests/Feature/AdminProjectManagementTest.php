@@ -33,6 +33,7 @@ final class AdminProjectManagementTest extends TestCase
         Project::factory()->create([
             'title' => 'Admin visible project',
             'published_at' => now(),
+            'is_protected' => true,
         ]);
 
         $this->actingAs($this->user)
@@ -41,7 +42,8 @@ final class AdminProjectManagementTest extends TestCase
             ->assertInertia(fn (Assert $page): Assert => $page
                 ->component('Admin/Projects/Index')
                 ->has('projects', 1)
-                ->where('projects.0.title', 'Admin visible project'));
+                ->where('projects.0.title', 'Admin visible project')
+                ->where('projects.0.is_protected', true));
     }
 
     public function test_admin_can_create_project_with_technologies_and_images(): void
@@ -201,5 +203,36 @@ final class AdminProjectManagementTest extends TestCase
         $this->assertSame(1, $image->sort_order);
         $this->assertStringStartsWith('projects/uploaded-project/admin-cover-', $image->path);
         Storage::disk('public')->assertExists($image->path);
+    }
+
+    public function test_admin_cannot_modify_protected_project(): void
+    {
+        $project = Project::factory()->create([
+            'slug' => 'protected-project',
+            'is_protected' => true,
+        ]);
+
+        $this->actingAs($this->user)
+            ->get("/admin/projects/{$project->id}/edit")
+            ->assertForbidden();
+
+        $this->actingAs($this->user)
+            ->put("/admin/projects/{$project->id}", [
+                'title' => 'Changed title',
+                'slug' => 'protected-project',
+                'description' => 'Updated description.',
+                'published' => true,
+                'sort_order' => 1,
+            ])
+            ->assertForbidden();
+
+        $this->actingAs($this->user)
+            ->delete("/admin/projects/{$project->id}")
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('projects', [
+            'id' => $project->id,
+            'title' => $project->title,
+        ]);
     }
 }

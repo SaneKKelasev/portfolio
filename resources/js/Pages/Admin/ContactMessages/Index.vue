@@ -27,7 +27,7 @@ defineProps({
                 class="text-xs font-semibold uppercase tracking-[0.18em]
                        text-accent"
             >
-                Messages
+                Сообщения
             </p>
             <h1 class="mt-4 text-4xl font-semibold text-text">
                 Контактные сообщения

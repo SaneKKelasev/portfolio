@@ -35,15 +35,21 @@ final class AdminProjectManagementTest extends TestCase
             'published_at' => now(),
             'is_protected' => true,
         ]);
+        Project::factory()->create([
+            'title' => 'Draft project',
+            'published_at' => null,
+        ]);
 
         $this->actingAs($this->user)
             ->get('/admin/projects')
             ->assertOk()
             ->assertInertia(fn (Assert $page): Assert => $page
                 ->component('Admin/Projects/Index')
-                ->has('projects', 1)
+                ->has('projects', 2)
                 ->where('projects.0.title', 'Admin visible project')
-                ->where('projects.0.is_protected', true));
+                ->where('projects.0.is_protected', true)
+                ->where('projects.1.title', 'Draft project')
+                ->where('projects.1.published', false));
     }
 
     public function test_admin_can_create_project_with_technologies_and_images(): void

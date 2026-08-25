@@ -111,6 +111,7 @@ function destroyProject(project) {
 
                 <div class="flex flex-wrap gap-3">
                     <Link
+                        v-if="project.published"
                         :href="`/projects/${project.slug}`"
                         class="rounded-full border border-border px-4 py-2
                                text-sm font-semibold text-text-muted
@@ -118,6 +119,13 @@ function destroyProject(project) {
                     >
                         Открыть
                     </Link>
+                    <span
+                        v-else
+                        class="rounded-full border border-border px-4 py-2
+                               text-sm font-semibold text-text-muted/70"
+                    >
+                        Не опубликован
+                    </span>
                     <Link
                         v-if="!project.is_protected"
                         :href="`/admin/projects/${project.id}/edit`"

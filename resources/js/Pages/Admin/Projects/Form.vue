@@ -41,8 +41,8 @@ const monthOptions = [
     { value: '11', label: 'Ноябрь' },
     { value: '12', label: 'Декабрь' },
 ];
+const monthLabels = monthOptions.map((month) => month.label);
 const currentYear = new Date().getFullYear();
-const yearOptions = Array.from({ length: 16 }, (_, index) => String(currentYear - index));
 const dayOptions = Array.from({ length: 31 }, (_, index) => String(index + 1).padStart(2, '0'));
 
 const form = useForm({
@@ -77,7 +77,6 @@ const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
 
 const textareaClass = 'mt-2 w-full min-h-36 max-h-72 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 const caseTextareaClass = 'mt-2 w-full min-h-40 max-h-80 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
-const dateSelectClass = 'min-w-0 rounded-xl border-0 bg-transparent px-3 py-3 text-text outline-none focus:bg-background/70';
 
 const uploadErrors = computed(() => Object.entries(form.errors)
     .filter(([key]) => key.startsWith('uploaded_images'))
@@ -125,6 +124,72 @@ function composeDate(parts) {
 function syncDates() {
     form.started_at = composeDate(startedAt.value);
     form.finished_at = composeDate(finishedAt.value);
+}
+
+function displayMonth(parts) {
+    if (!parts.month) {
+        return 'Месяц';
+    }
+
+    return monthLabels[Number(parts.month) - 1];
+}
+
+function displayYear(parts) {
+    return parts.year || 'Год';
+}
+
+function daysInMonth(parts) {
+    const year = Number(parts.year || currentYear);
+    const month = Number(parts.month || new Date().getMonth() + 1);
+
+    return new Date(year, month, 0).getDate();
+}
+
+function visibleDayOptions(parts) {
+    return dayOptions.slice(0, daysInMonth(parts));
+}
+
+function clampDay(parts) {
+    if (parts.day && Number(parts.day) > daysInMonth(parts)) {
+        parts.day = String(daysInMonth(parts)).padStart(2, '0');
+    }
+}
+
+function shiftMonth(parts, direction) {
+    const currentMonth = parts.month ? Number(parts.month) : new Date().getMonth() + 1;
+    const nextMonth = ((currentMonth - 1 + direction + 12) % 12) + 1;
+    parts.month = String(nextMonth).padStart(2, '0');
+
+    if (!parts.year) {
+        parts.year = String(currentYear);
+    }
+
+    clampDay(parts);
+}
+
+function shiftYear(parts, direction) {
+    const year = parts.year ? Number(parts.year) : currentYear;
+    parts.year = String(year + direction);
+
+    clampDay(parts);
+}
+
+function selectDay(parts, day) {
+    parts.day = day;
+
+    if (!parts.month) {
+        parts.month = String(new Date().getMonth() + 1).padStart(2, '0');
+    }
+
+    if (!parts.year) {
+        parts.year = String(currentYear);
+    }
+}
+
+function clearDate(parts) {
+    parts.day = '';
+    parts.month = '';
+    parts.year = '';
 }
 
 function removeImage(index) {
@@ -361,25 +426,50 @@ function submit() {
 
                 <label class="block">
                     <span class="text-sm font-semibold text-text">Начало</span>
-                    <div class="mt-2 grid grid-cols-1 overflow-hidden rounded-2xl border border-border bg-background/70 sm:grid-cols-[5.5rem_minmax(0,1fr)_6.5rem]">
-                        <select v-model="startedAt.day" :class="dateSelectClass">
-                            <option value="">ДД</option>
-                            <option v-for="day in dayOptions" :key="day" :value="day">
+                    <div class="mt-2 rounded-2xl border border-border bg-background/45 p-3">
+                        <div class="grid gap-2 sm:grid-cols-[1fr_7rem]">
+                            <div class="flex items-center justify-between rounded-xl border border-border bg-background/70">
+                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftMonth(startedAt, -1)">
+                                    ←
+                                </button>
+                                <span class="text-sm font-semibold text-text">
+                                    {{ displayMonth(startedAt) }}
+                                </span>
+                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftMonth(startedAt, 1)">
+                                    →
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between rounded-xl border border-border bg-background/70">
+                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftYear(startedAt, -1)">
+                                    −
+                                </button>
+                                <span class="text-sm font-semibold text-text">
+                                    {{ displayYear(startedAt) }}
+                                </span>
+                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftYear(startedAt, 1)">
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-3 grid grid-cols-7 gap-1">
+                            <button
+                                v-for="day in visibleDayOptions(startedAt)"
+                                :key="day"
+                                type="button"
+                                class="rounded-lg px-2 py-2 text-xs font-semibold transition"
+                                :class="
+                                    startedAt.day === day
+                                        ? 'bg-primary text-white'
+                                        : 'text-text-muted hover:bg-white/[0.04] hover:text-white'
+                                "
+                                @click="selectDay(startedAt, day)"
+                            >
                                 {{ day }}
-                            </option>
-                        </select>
-                        <select v-model="startedAt.month" :class="[dateSelectClass, 'border-y border-border sm:border-x sm:border-y-0']">
-                            <option value="">Месяц</option>
-                            <option v-for="month in monthOptions" :key="month.value" :value="month.value">
-                                {{ month.label }}
-                            </option>
-                        </select>
-                        <select v-model="startedAt.year" :class="dateSelectClass">
-                            <option value="">ГГГГ</option>
-                            <option v-for="year in yearOptions" :key="year" :value="year">
-                                {{ year }}
-                            </option>
-                        </select>
+                            </button>
+                        </div>
+                        <button type="button" class="mt-3 text-xs font-semibold text-text-muted transition hover:text-white" @click="clearDate(startedAt)">
+                            Очистить дату
+                        </button>
                     </div>
                     <span v-if="form.errors.started_at" class="mt-2 block text-sm text-rose-300">
                         {{ form.errors.started_at }}
@@ -388,25 +478,50 @@ function submit() {
 
                 <label class="block">
                     <span class="text-sm font-semibold text-text">Завершение</span>
-                    <div class="mt-2 grid grid-cols-1 overflow-hidden rounded-2xl border border-border bg-background/70 sm:grid-cols-[5.5rem_minmax(0,1fr)_6.5rem]">
-                        <select v-model="finishedAt.day" :class="dateSelectClass">
-                            <option value="">ДД</option>
-                            <option v-for="day in dayOptions" :key="day" :value="day">
+                    <div class="mt-2 rounded-2xl border border-border bg-background/45 p-3">
+                        <div class="grid gap-2 sm:grid-cols-[1fr_7rem]">
+                            <div class="flex items-center justify-between rounded-xl border border-border bg-background/70">
+                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftMonth(finishedAt, -1)">
+                                    ←
+                                </button>
+                                <span class="text-sm font-semibold text-text">
+                                    {{ displayMonth(finishedAt) }}
+                                </span>
+                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftMonth(finishedAt, 1)">
+                                    →
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between rounded-xl border border-border bg-background/70">
+                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftYear(finishedAt, -1)">
+                                    −
+                                </button>
+                                <span class="text-sm font-semibold text-text">
+                                    {{ displayYear(finishedAt) }}
+                                </span>
+                                <button type="button" class="px-3 py-2 text-text-muted transition hover:text-white" @click="shiftYear(finishedAt, 1)">
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-3 grid grid-cols-7 gap-1">
+                            <button
+                                v-for="day in visibleDayOptions(finishedAt)"
+                                :key="day"
+                                type="button"
+                                class="rounded-lg px-2 py-2 text-xs font-semibold transition"
+                                :class="
+                                    finishedAt.day === day
+                                        ? 'bg-primary text-white'
+                                        : 'text-text-muted hover:bg-white/[0.04] hover:text-white'
+                                "
+                                @click="selectDay(finishedAt, day)"
+                            >
                                 {{ day }}
-                            </option>
-                        </select>
-                        <select v-model="finishedAt.month" :class="[dateSelectClass, 'border-y border-border sm:border-x sm:border-y-0']">
-                            <option value="">Месяц</option>
-                            <option v-for="month in monthOptions" :key="month.value" :value="month.value">
-                                {{ month.label }}
-                            </option>
-                        </select>
-                        <select v-model="finishedAt.year" :class="dateSelectClass">
-                            <option value="">ГГГГ</option>
-                            <option v-for="year in yearOptions" :key="year" :value="year">
-                                {{ year }}
-                            </option>
-                        </select>
+                            </button>
+                        </div>
+                        <button type="button" class="mt-3 text-xs font-semibold text-text-muted transition hover:text-white" @click="clearDate(finishedAt)">
+                            Очистить дату
+                        </button>
                     </div>
                     <span v-if="form.errors.finished_at" class="mt-2 block text-sm text-rose-300">
                         {{ form.errors.finished_at }}

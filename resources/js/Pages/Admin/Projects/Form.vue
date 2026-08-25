@@ -59,6 +59,9 @@ const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
 const textareaClass = 'mt-2 w-full min-h-36 max-h-72 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 const caseTextareaClass = 'mt-2 w-full min-h-40 max-h-80 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 const datePickerClass = 'portfolio-date-picker mt-2';
+const datePickerTimeConfig = {
+    enableTimePicker: false,
+};
 
 const uploadErrors = computed(() => Object.entries(form.errors)
     .filter(([key]) => key.startsWith('uploaded_images'))
@@ -315,8 +318,7 @@ function submit() {
                         dark
                         auto-apply
                         clearable
-                        :enable-time-picker="false"
-                        :hide-navigation="['time']"
+                        :time-config="datePickerTimeConfig"
                         placeholder="Выберите дату начала"
                     />
                     <span v-if="form.errors.started_at" class="mt-2 block text-sm text-rose-300">
@@ -335,8 +337,7 @@ function submit() {
                         dark
                         auto-apply
                         clearable
-                        :enable-time-picker="false"
-                        :hide-navigation="['time']"
+                        :time-config="datePickerTimeConfig"
                         placeholder="Выберите дату завершения"
                     />
                     <span v-if="form.errors.finished_at" class="mt-2 block text-sm text-rose-300">
@@ -578,8 +579,4 @@ function submit() {
     box-shadow: 0 24px 70px rgb(0 0 0 / 0.45);
 }
 
-.portfolio-date-picker :deep(.dp--button-bottom),
-.portfolio-date-picker :deep([data-test-id="open-time-picker-btn"]) {
-    display: none;
-}
 </style>

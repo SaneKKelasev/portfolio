@@ -100,9 +100,9 @@ function selectTechnology(slug) {
                 class="mt-10 rounded-3xl border border-border bg-surface/75
                        p-5 shadow-2xl shadow-black/30 sm:p-6"
             >
-                <div class="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+                <div class="grid gap-6 xl:grid-cols-[minmax(22rem,0.9fr)_1fr]">
                     <label class="block">
-                        <span class="text-sm font-medium text-text">Поиск</span>
+                        <span class="text-sm font-semibold text-text">Поиск</span>
                         <input
                             v-model="search"
                             type="search"
@@ -114,22 +114,25 @@ function selectTechnology(slug) {
                         >
                     </label>
 
-                    <div class="flex flex-wrap gap-2">
-                        <button
-                            v-for="technology in technologies"
-                            :key="technology.slug"
-                            type="button"
-                            class="rounded-full border px-4 py-2 text-sm
-                                   font-semibold transition"
-                            :class="
-                                filters.technology === technology.slug
-                                    ? 'border-accent bg-accent/10 text-accent'
-                                    : 'border-border-bright/60 text-text-muted hover:border-accent/70 hover:text-white'
-                            "
-                            @click="selectTechnology(technology.slug)"
-                        >
-                            {{ technology.name }}
-                        </button>
+                    <div>
+                        <p class="text-sm font-semibold text-text">Технологии</p>
+                        <div class="mt-2 flex flex-wrap gap-2">
+                            <button
+                                v-for="technology in technologies"
+                                :key="technology.slug"
+                                type="button"
+                                class="rounded-full border px-4 py-3 text-sm
+                                       font-semibold transition"
+                                :class="
+                                    filters.technology === technology.slug
+                                        ? 'border-accent bg-accent/10 text-accent'
+                                        : 'border-border-bright/60 text-text-muted hover:border-accent/70 hover:text-white'
+                                "
+                                @click="selectTechnology(technology.slug)"
+                            >
+                                {{ technology.name }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

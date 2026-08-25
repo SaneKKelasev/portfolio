@@ -32,13 +32,12 @@ defineProps({
                 ← Все проекты
             </Link>
 
-            <section
-                class="mt-10 grid gap-10 rounded-3xl border
-                       border-border-bright/70 bg-surface/80 p-6 shadow-2xl
-                       shadow-black/30 sm:p-8 lg:grid-cols-[0.8fr_1.2fr]
-                       lg:p-12"
-            >
-                <div>
+            <section class="mt-10 grid gap-10 lg:grid-cols-[0.75fr_1.25fr]">
+                <div
+                    class="rounded-3xl border border-border-bright/70
+                           bg-surface/80 p-6 shadow-2xl shadow-black/30
+                           sm:p-8 lg:p-10"
+                >
                     <p
                         class="text-xs font-semibold uppercase
                                tracking-[0.18em] text-accent"
@@ -93,9 +92,30 @@ defineProps({
                             Исходный код
                         </a>
                     </div>
+
+                    <dl
+                        class="mt-10 grid grid-cols-2 gap-4 border-t
+                               border-border pt-6 text-sm"
+                    >
+                        <div>
+                            <dt class="text-text-muted">Начало</dt>
+                            <dd class="mt-1 font-semibold text-text">
+                                {{ project.started_at ?? '—' }}
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-text-muted">Завершение</dt>
+                            <dd class="mt-1 font-semibold text-text">
+                                {{ project.finished_at ?? '—' }}
+                            </dd>
+                        </div>
+                    </dl>
                 </div>
 
-                <ProjectGallery :images="project.images" />
+                <div>
+                    <ProjectGallery :images="project.images" />
+                </div>
             </section>
 
             <section class="mt-10 grid gap-6 lg:grid-cols-3">

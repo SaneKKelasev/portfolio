@@ -180,6 +180,39 @@ Tests:
 
 Ценность для Laravel: высокая.
 
+### 6.1. Демонстрационная Админка
+
+Пользователь-владелец входит в защищённую панель и управляет проектами и сообщениями.
+
+Backend:
+- стандартный Laravel session auth;
+- protected routes под `/admin`;
+- dashboard controller;
+- project CRUD controller;
+- contact message admin controller;
+- Form Request для project create/update;
+- Action с transaction для сохранения project + technologies + images.
+
+БД:
+- использовать существующие `users`, `projects`, `technologies`, `project_images`, `contact_messages`;
+- дополнительных таблиц не нужно.
+
+Frontend:
+- login page;
+- admin layout;
+- dashboard;
+- projects index/form;
+- contact messages index/show.
+
+Tests:
+- guest redirect на login;
+- login/logout;
+- admin видит dashboard;
+- create/update project;
+- mark contact message as read.
+
+Ценность для Laravel: очень высокая.
+
 ### 7. SEO И Meta
 
 Пользователь напрямую это почти не видит, но страницы получают нормальные title/description.

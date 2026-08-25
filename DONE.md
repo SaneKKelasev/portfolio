@@ -172,3 +172,52 @@ npm run build
 - добавлены дополнительные демо-проекты `TaskFlow` и `MetricBoard`;
 - сидер остаётся идемпотентным через `updateOrCreate`;
 - technology sync сохранён.
+
+## Product Polish And Admin
+
+### Detail Page И Каталог
+
+Сделано:
+- detail page визуально отделён от карточки проекта;
+- первый экран detail page стал больше похож на case study;
+- добавлены даты начала и завершения проекта;
+- блок фильтров каталога выровнен;
+- поиск и technology chips стали выглядеть как единая панель.
+
+### Auth И Admin Skeleton
+
+Сделано:
+- добавлен login/logout на стандартном Laravel session auth;
+- добавлена protected admin area под `/admin`;
+- добавлен admin layout;
+- добавлен dashboard с метриками;
+- добавлены последние контактные сообщения на dashboard;
+- shared Inertia props теперь содержат текущего пользователя.
+
+### Admin Project CRUD
+
+Сделано:
+- добавлен список проектов в админке;
+- добавлено создание проекта;
+- добавлено редактирование проекта;
+- добавлено удаление проекта;
+- добавлен `ProjectRequest` для validation;
+- добавлен `SaveProjectAction`;
+- сохранение проекта, технологий и изображений выполняется в transaction;
+- технологии синхронизируются через many-to-many;
+- изображения пересобираются атомарно.
+
+### Admin Contact Messages
+
+Сделано:
+- добавлен список сообщений;
+- добавлен просмотр сообщения;
+- добавлено действие mark as read;
+- dashboard считает unread messages.
+
+### Tests
+
+Сделано:
+- добавлены tests для login/logout/admin access;
+- добавлены tests для admin project index/create/update;
+- добавлены tests для admin contact messages и mark as read.

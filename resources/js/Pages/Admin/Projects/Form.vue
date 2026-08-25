@@ -77,7 +77,7 @@ const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
 
 const textareaClass = 'mt-2 w-full min-h-36 max-h-72 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 const caseTextareaClass = 'mt-2 w-full min-h-40 max-h-80 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
-const dateSelectClass = 'w-full rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
+const dateSelectClass = 'min-w-0 rounded-xl border-0 bg-transparent px-3 py-3 text-text outline-none focus:bg-background/70';
 
 const uploadErrors = computed(() => Object.entries(form.errors)
     .filter(([key]) => key.startsWith('uploaded_images'))
@@ -361,21 +361,21 @@ function submit() {
 
                 <label class="block">
                     <span class="text-sm font-semibold text-text">Начало</span>
-                    <div class="mt-2 grid grid-cols-1 gap-2 rounded-2xl border border-border bg-background/35 p-2 sm:grid-cols-[5rem_1fr_6rem]">
+                    <div class="mt-2 grid grid-cols-1 overflow-hidden rounded-2xl border border-border bg-background/70 sm:grid-cols-[5.5rem_minmax(0,1fr)_6.5rem]">
                         <select v-model="startedAt.day" :class="dateSelectClass">
-                            <option value="">День</option>
+                            <option value="">ДД</option>
                             <option v-for="day in dayOptions" :key="day" :value="day">
                                 {{ day }}
                             </option>
                         </select>
-                        <select v-model="startedAt.month" :class="dateSelectClass">
+                        <select v-model="startedAt.month" :class="[dateSelectClass, 'border-y border-border sm:border-x sm:border-y-0']">
                             <option value="">Месяц</option>
                             <option v-for="month in monthOptions" :key="month.value" :value="month.value">
                                 {{ month.label }}
                             </option>
                         </select>
                         <select v-model="startedAt.year" :class="dateSelectClass">
-                            <option value="">Год</option>
+                            <option value="">ГГГГ</option>
                             <option v-for="year in yearOptions" :key="year" :value="year">
                                 {{ year }}
                             </option>
@@ -388,21 +388,21 @@ function submit() {
 
                 <label class="block">
                     <span class="text-sm font-semibold text-text">Завершение</span>
-                    <div class="mt-2 grid grid-cols-1 gap-2 rounded-2xl border border-border bg-background/35 p-2 sm:grid-cols-[5rem_1fr_6rem]">
+                    <div class="mt-2 grid grid-cols-1 overflow-hidden rounded-2xl border border-border bg-background/70 sm:grid-cols-[5.5rem_minmax(0,1fr)_6.5rem]">
                         <select v-model="finishedAt.day" :class="dateSelectClass">
-                            <option value="">День</option>
+                            <option value="">ДД</option>
                             <option v-for="day in dayOptions" :key="day" :value="day">
                                 {{ day }}
                             </option>
                         </select>
-                        <select v-model="finishedAt.month" :class="dateSelectClass">
+                        <select v-model="finishedAt.month" :class="[dateSelectClass, 'border-y border-border sm:border-x sm:border-y-0']">
                             <option value="">Месяц</option>
                             <option v-for="month in monthOptions" :key="month.value" :value="month.value">
                                 {{ month.label }}
                             </option>
                         </select>
                         <select v-model="finishedAt.year" :class="dateSelectClass">
-                            <option value="">Год</option>
+                            <option value="">ГГГГ</option>
                             <option v-for="year in yearOptions" :key="year" :value="year">
                                 {{ year }}
                             </option>

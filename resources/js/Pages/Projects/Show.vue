@@ -1,5 +1,6 @@
 <script setup>
 import ProjectGallery from '@/Components/Project/Gallery.vue';
+import SiteHeader from '@/Components/SiteHeader.vue';
 import TechnologyBadge from '@/Components/Project/TechnologyBadge.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
@@ -22,8 +23,10 @@ defineProps({
         <meta name="description" :content="meta.description">
     </Head>
 
-    <main class="min-h-screen bg-background px-5 py-12 sm:px-8 lg:px-10">
-        <article class="mx-auto w-full max-w-7xl">
+    <main class="min-h-screen bg-background">
+        <SiteHeader />
+
+        <article class="mx-auto w-full max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
             <Link
                 href="/projects"
                 class="text-sm font-semibold text-text-muted transition

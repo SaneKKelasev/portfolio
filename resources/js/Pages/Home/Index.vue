@@ -1,6 +1,7 @@
 <script setup>
 import ContactForm from '@/Components/Contact/Form.vue';
 import ProjectCard from '@/Components/Project/Card.vue';
+import SiteHeader from '@/Components/SiteHeader.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
 defineProps({
@@ -32,6 +33,8 @@ defineProps({
                    -translate-x-1/2 bg-gradient-to-r from-transparent
                    via-accent/60 to-transparent"
         />
+
+        <SiteHeader />
 
         <section
             class="mx-auto w-full max-w-7xl px-5 py-12

@@ -1,6 +1,7 @@
 <script setup>
 import ProjectCard from '@/Components/Project/Card.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import SiteHeader from '@/Components/SiteHeader.vue';
+import { Head, router } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 
 const props = defineProps({
@@ -68,17 +69,11 @@ function selectTechnology(slug) {
         <meta name="description" :content="meta.description">
     </Head>
 
-    <main class="min-h-screen bg-background px-5 py-12 sm:px-8 lg:px-10">
-        <section class="mx-auto w-full max-w-7xl">
-            <Link
-                href="/"
-                class="text-sm font-semibold text-text-muted transition
-                       hover:text-white"
-            >
-                ← На главную
-            </Link>
+    <main class="min-h-screen bg-background">
+        <SiteHeader />
 
-            <header class="mt-10 max-w-3xl">
+        <section class="mx-auto w-full max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
+            <header class="max-w-3xl">
                 <p
                     class="text-xs font-semibold uppercase tracking-[0.18em]
                            text-accent"

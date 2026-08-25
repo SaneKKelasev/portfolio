@@ -1,7 +1,7 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     project: {
@@ -23,6 +23,7 @@ const props = defineProps({
 const page = usePage();
 const successMessage = computed(() => page.props.flash?.success ?? null);
 const isEditing = computed(() => props.project.id !== null);
+const uploadInput = ref(null);
 
 const form = useForm({
     title: props.project.title ?? '',
@@ -42,7 +43,12 @@ const form = useForm({
     images: props.project.images.length > 0
         ? props.project.images
         : [{ path: '', alt: '', sort_order: 1 }],
+    uploaded_images: [],
 });
+
+const uploadErrors = computed(() => Object.entries(form.errors)
+    .filter(([key]) => key.startsWith('uploaded_images'))
+    .map(([, message]) => message));
 
 function toggleTechnology(id) {
     if (form.technologies.includes(id)) {
@@ -65,15 +71,38 @@ function removeImage(index) {
     form.images.splice(index, 1);
 }
 
+function selectUploads(event) {
+    form.uploaded_images = Array.from(event.target.files ?? []);
+}
+
+function normalizedImages(images) {
+    return images.filter((image) => (image.path ?? '').trim() !== '');
+}
+
 function submit() {
+    form.transform((data) => ({
+        ...data,
+        images: normalizedImages(data.images),
+        ...(isEditing.value ? { _method: 'put' } : {}),
+    }));
+
     if (isEditing.value) {
-        form.put(`/admin/projects/${props.project.id}`, {
+        form.post(`/admin/projects/${props.project.id}`, {
+            forceFormData: true,
             preserveScroll: true,
+            onSuccess: () => {
+                form.uploaded_images = [];
+                if (uploadInput.value) {
+                    uploadInput.value.value = '';
+                }
+            },
         });
         return;
     }
 
-    form.post('/admin/projects');
+    form.post('/admin/projects', {
+        forceFormData: true,
+    });
 }
 </script>
 
@@ -266,6 +295,62 @@ function submit() {
                     <button type="button" class="text-sm font-semibold text-accent" @click="addImage">
                         Добавить
                     </button>
+                </div>
+
+                <div
+                    class="mt-5 rounded-2xl border border-dashed border-border-bright/60
+                           bg-background/45 p-4"
+                >
+                    <label class="block">
+                        <span class="text-sm font-semibold text-text">
+                            Загрузить изображения
+                        </span>
+                        <input
+                            ref="uploadInput"
+                            type="file"
+                            multiple
+                            accept="image/png,image/jpeg,image/webp"
+                            class="mt-3 block w-full text-sm text-text-muted
+                                   file:mr-4 file:rounded-full file:border-0
+                                   file:bg-primary file:px-4 file:py-2
+                                   file:text-sm file:font-semibold file:text-white
+                                   hover:file:bg-violet-500"
+                            @change="selectUploads"
+                        >
+                    </label>
+
+                    <p class="mt-3 text-sm text-text-muted">
+                        Файлы сохранятся в public storage автоматически. Ручные пути ниже можно оставить для уже загруженных изображений.
+                    </p>
+
+                    <div
+                        v-if="form.uploaded_images.length > 0"
+                        class="mt-3 flex flex-wrap gap-2"
+                    >
+                        <span
+                            v-for="file in form.uploaded_images"
+                            :key="file.name"
+                            class="rounded-full border border-border-bright/60 px-3 py-1
+                                   text-xs font-semibold text-text"
+                        >
+                            {{ file.name }}
+                        </span>
+                    </div>
+
+                    <p
+                        v-if="form.errors.uploaded_images"
+                        class="mt-3 text-sm text-rose-300"
+                    >
+                        {{ form.errors.uploaded_images }}
+                    </p>
+
+                    <p
+                        v-for="error in uploadErrors"
+                        :key="error"
+                        class="mt-2 text-sm text-rose-300"
+                    >
+                        {{ error }}
+                    </p>
                 </div>
 
                 <div class="mt-4 space-y-4">

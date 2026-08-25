@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 final class ProjectRequest extends FormRequest
 {
@@ -110,7 +112,33 @@ final class ProjectRequest extends FormRequest
                 'max:10000',
                 'distinct',
             ],
+            'uploaded_images' => [
+                'array',
+                'max:8',
+            ],
+            'uploaded_images.*' => [
+                'file',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:4096',
+            ],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $images = $this->input('images', []);
+            $manualImages = is_array($images) ? count($images) : 0;
+            $uploadedImages = count($this->uploadedImages());
+
+            if ($manualImages + $uploadedImages > 8) {
+                $validator->errors()->add(
+                    'uploaded_images',
+                    'У проекта может быть не больше 8 изображений.',
+                );
+            }
+        });
     }
 
     /**
@@ -154,5 +182,19 @@ final class ProjectRequest extends FormRequest
     public function images(): array
     {
         return array_values($this->validated('images', []));
+    }
+
+    /**
+     * @return list<UploadedFile>
+     */
+    public function uploadedImages(): array
+    {
+        $files = $this->file('uploaded_images', []);
+
+        if ($files instanceof UploadedFile) {
+            return [$files];
+        }
+
+        return array_values($files);
     }
 }

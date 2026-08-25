@@ -8,6 +8,8 @@ use App\Models\Project;
 use App\Models\Technology;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -174,5 +176,30 @@ final class AdminProjectManagementTest extends TestCase
             'project_id' => $project->id,
             'path' => 'projects/new/cover.webp',
         ]);
+    }
+
+    public function test_admin_can_upload_project_images(): void
+    {
+        Storage::fake('public');
+
+        $this->actingAs($this->user)
+            ->post('/admin/projects', [
+                'title' => 'Uploaded Project',
+                'slug' => 'uploaded-project',
+                'description' => 'Project with uploaded images.',
+                'published' => true,
+                'sort_order' => 30,
+                'uploaded_images' => [
+                    UploadedFile::fake()->image('admin-cover.jpg', 1200, 800),
+                ],
+            ])
+            ->assertRedirect();
+
+        $project = Project::query()->where('slug', 'uploaded-project')->firstOrFail();
+        $image = $project->images()->firstOrFail();
+
+        $this->assertSame(1, $image->sort_order);
+        $this->assertStringStartsWith('projects/uploaded-project/admin-cover-', $image->path);
+        Storage::disk('public')->assertExists($image->path);
     }
 }

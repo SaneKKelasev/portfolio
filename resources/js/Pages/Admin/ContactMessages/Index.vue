@@ -55,12 +55,12 @@ defineProps({
                             class="rounded-full border px-3 py-1 text-xs
                                    font-semibold"
                             :class="
-                                message.read_at
+                                message.is_read
                                     ? 'border-border text-text-muted'
                                     : 'border-accent text-accent'
                             "
                         >
-                            {{ message.read_at ? 'прочитано' : 'новое' }}
+                            {{ message.is_read ? 'прочитано' : 'новое' }}
                         </span>
                     </div>
                     <p class="mt-2 text-sm text-text-muted">
@@ -68,9 +68,12 @@ defineProps({
                     </p>
                 </div>
 
-                <p class="text-sm text-text-muted">
-                    {{ message.created_at }}
-                </p>
+                <div class="text-sm text-text-muted lg:text-right">
+                    <p class="text-xs uppercase tracking-wide text-text-subtle">
+                        Дата
+                    </p>
+                    <p class="mt-1 text-text-muted">{{ message.created_at }}</p>
+                </div>
             </Link>
 
             <p v-if="messages.data.length === 0" class="p-8 text-text-muted">

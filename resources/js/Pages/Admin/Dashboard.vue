@@ -84,12 +84,12 @@ defineProps({
                         class="rounded-full border px-3 py-1 text-xs
                                font-semibold"
                         :class="
-                            message.read_at
+                            message.is_read
                                 ? 'border-border text-text-muted'
                                 : 'border-accent text-accent'
                         "
                     >
-                        {{ message.read_at ? 'прочитано' : 'новое' }}
+                        {{ message.is_read ? 'прочитано' : 'новое' }}
                     </span>
                 </Link>
 

@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\ContactMessage;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -27,11 +28,16 @@ final class AdminContactMessageTest extends TestCase
 
     public function test_admin_can_view_contact_messages(): void
     {
-        ContactMessage::query()->create([
+        config(['app.display_timezone' => 'Europe/Moscow']);
+
+        $message = ContactMessage::query()->create([
             'name' => 'Client',
             'email' => 'client@example.com',
             'message' => 'I want to discuss a Laravel project with you.',
         ]);
+        $message->forceFill([
+            'created_at' => CarbonImmutable::parse('2026-08-25 14:07:27', 'UTC'),
+        ])->save();
 
         $this->actingAs($this->user)
             ->get('/admin/contact-messages')
@@ -39,7 +45,9 @@ final class AdminContactMessageTest extends TestCase
             ->assertInertia(fn (Assert $page): Assert => $page
                 ->component('Admin/ContactMessages/Index')
                 ->has('messages.data', 1)
-                ->where('messages.data.0.name', 'Client'));
+                ->where('messages.data.0.name', 'Client')
+                ->where('messages.data.0.created_at', '25.08.2026 17:07')
+                ->where('messages.data.0.is_read', false));
     }
 
     public function test_admin_can_mark_contact_message_as_read(): void

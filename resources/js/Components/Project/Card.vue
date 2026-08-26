@@ -109,7 +109,7 @@ defineProps({
                 </div>
             </div>
 
-            <ProjectGallery :images="project.images" />
+            <ProjectGallery :images="project.images" :title="project.title" />
         </div>
     </article>
 </template>

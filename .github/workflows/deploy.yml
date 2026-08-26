@@ -48,6 +48,9 @@ jobs:
             --prefer-dist \
             --no-progress
 
+      - name: Check PHP Code Style
+        run: vendor/bin/pint --test
+
       - name: Prepare Laravel Test Environment
         run: |
           cp .env.example .env

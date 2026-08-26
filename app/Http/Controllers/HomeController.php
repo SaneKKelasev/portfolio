@@ -14,15 +14,19 @@ final class HomeController extends Controller
         $projects = Project::query()
             ->with([
                 'images',
-                'technologies'
+                'technologies',
             ])
-            ->whereNotNull('published_at')
+            ->published()
             ->latest('published_at')
             ->limit(6)
             ->get();
-        
+
         return Inertia::render('Home/Index', [
             'projects' => ProjectCardResource::collection($projects)->resolve(),
+            'meta' => [
+                'title' => 'PortfolioHub',
+                'description' => 'Портфолио проектов на Laravel, Inertia и Vue.',
+            ],
         ]);
     }
 }

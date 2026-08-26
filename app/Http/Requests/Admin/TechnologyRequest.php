@@ -43,6 +43,20 @@ final class TechnologyRequest extends FormRequest
     }
 
     /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Укажите название технологии.',
+            'name.max' => 'Название технологии не должно быть длиннее 100 символов.',
+            'name.unique' => 'Такая технология уже есть.',
+            'slug.max' => 'Slug не должен быть длиннее 100 символов.',
+            'slug.unique' => 'Такой slug уже занят.',
+        ];
+    }
+
+    /**
      * @return array{name: string, slug: string}
      */
     public function technologyData(): array

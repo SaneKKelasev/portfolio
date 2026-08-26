@@ -2,7 +2,6 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { VueDatePicker } from '@vuepic/vue-datepicker';
-import { ru } from 'date-fns/locale';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { computed, ref } from 'vue';
 
@@ -28,6 +27,8 @@ const successMessage = computed(() => page.props.flash?.success ?? null);
 const isEditing = computed(() => props.project.id !== null);
 const uploadInput = ref(null);
 const isDragging = ref(false);
+const saveFeedback = ref('');
+let saveFeedbackTimer = null;
 let uploadedImageId = 0;
 
 const form = useForm({
@@ -72,6 +73,7 @@ const russianDayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 const uploadErrors = computed(() => Object.entries(form.errors)
     .filter(([key]) => key.startsWith('uploaded_images'))
     .map(([, message]) => message));
+const visibleSaveMessage = computed(() => saveFeedback.value || successMessage.value);
 
 function toggleTechnology(id) {
     if (form.technologies.includes(id)) {
@@ -187,7 +189,21 @@ function syncGalleryPayload() {
     form.uploaded_images_meta = uploadedImagesMeta;
 }
 
+function showSaveFeedback(message) {
+    saveFeedback.value = message;
+
+    if (saveFeedbackTimer) {
+        clearTimeout(saveFeedbackTimer);
+    }
+
+    saveFeedbackTimer = setTimeout(() => {
+        saveFeedback.value = '';
+        saveFeedbackTimer = null;
+    }, 5000);
+}
+
 function submit() {
+    saveFeedback.value = '';
     syncGalleryPayload();
 
     form.transform((data) => ({
@@ -201,6 +217,7 @@ function submit() {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
+                showSaveFeedback('Проект сохранён. Изменения уже применены.');
                 form.uploaded_images = [];
                 form.uploaded_images_meta = [];
                 if (uploadInput.value) {
@@ -213,6 +230,7 @@ function submit() {
 
     form.post('/admin/projects', {
         forceFormData: true,
+        onSuccess: () => showSaveFeedback('Проект создан. Можно продолжить редактирование.'),
     });
 }
 </script>
@@ -540,15 +558,27 @@ function submit() {
                 </div>
             </section>
 
-            <button
-                type="submit"
-                :disabled="form.processing"
-                class="rounded-full bg-primary px-6 py-3 text-sm font-semibold
-                       text-white shadow-lg shadow-primary/25 transition
-                       hover:bg-violet-500 disabled:opacity-60"
-            >
-                {{ form.processing ? 'Сохранение...' : 'Сохранить проект' }}
-            </button>
+            <div class="flex flex-wrap items-center gap-4">
+                <button
+                    type="submit"
+                    :disabled="form.processing"
+                    class="rounded-full bg-primary px-6 py-3 text-sm font-semibold
+                           text-white shadow-lg shadow-primary/25 transition
+                           hover:bg-violet-500 disabled:opacity-60"
+                >
+                    {{ form.processing ? 'Сохранение...' : 'Сохранить проект' }}
+                </button>
+
+                <p
+                    v-if="visibleSaveMessage"
+                    class="rounded-full border border-success/40 bg-success/10
+                           px-4 py-3 text-sm font-semibold text-success"
+                    role="status"
+                    aria-live="polite"
+                >
+                    {{ visibleSaveMessage }}
+                </p>
+            </div>
         </form>
     </AdminLayout>
 </template>

@@ -48,11 +48,6 @@ final class ProjectRequest extends FormRequest
                 'string',
                 'max:5000',
             ],
-            'role' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
             'problem' => [
                 'nullable',
                 'string',
@@ -227,7 +222,6 @@ final class ProjectRequest extends FormRequest
             'title' => $validated['title'],
             'slug' => $validated['slug'],
             'description' => $validated['description'],
-            'role' => $validated['role'] ?? null,
             'problem' => $validated['problem'] ?? null,
             'solution' => $validated['solution'] ?? null,
             'result' => $validated['result'] ?? null,

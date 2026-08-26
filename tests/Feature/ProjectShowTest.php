@@ -26,7 +26,6 @@ final class ProjectShowTest extends TestCase
         $project = Project::factory()->create([
             'title' => 'PortfolioHub',
             'slug' => 'portfoliohub',
-            'role' => 'Fullstack developer',
             'problem' => 'Show a strong Laravel portfolio project.',
             'solution' => 'Build a compact Inertia application.',
             'result' => 'A public code sample with tests.',
@@ -51,7 +50,6 @@ final class ProjectShowTest extends TestCase
             ->assertInertia(fn (Assert $page): Assert => $page
                 ->component('Projects/Show')
                 ->where('project.title', 'PortfolioHub')
-                ->where('project.role', 'Fullstack developer')
                 ->where('project.problem', 'Show a strong Laravel portfolio project.')
                 ->where('project.solution', 'Build a compact Inertia application.')
                 ->where('project.result', 'A public code sample with tests.')

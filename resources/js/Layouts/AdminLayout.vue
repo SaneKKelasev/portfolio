@@ -16,9 +16,10 @@ function logout() {
             class="fixed inset-y-0 left-0 hidden w-72 border-r border-border
                    bg-surface/80 p-6 backdrop-blur lg:block"
         >
-            <Link href="/admin" class="text-2xl font-semibold text-text">
+            <a href="/" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 text-2xl font-semibold text-text transition hover:text-accent" title="Открыть главную страницу">
                 PortfolioHub
-            </Link>
+                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none"><path d="M7 5h8m0 0v8m0-8L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </a>
             <p class="mt-1 text-sm text-text-muted">Панель управления</p>
 
             <nav class="mt-10 space-y-2">
@@ -75,7 +76,7 @@ function logout() {
                 class="flex items-center justify-between border-b border-border
                        bg-surface/50 px-5 py-4 backdrop-blur sm:px-8 lg:hidden"
             >
-                <Link href="/admin" class="font-semibold text-text">
+                <Link href="/" class="font-semibold text-text">
                     PortfolioHub
                 </Link>
                 <button

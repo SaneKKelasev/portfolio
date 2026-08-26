@@ -45,7 +45,7 @@ defineProps({
                         class="text-xs font-semibold uppercase
                                tracking-[0.18em] text-accent"
                     >
-                        {{ project.role ?? 'Проект' }}
+                        Проект
                     </p>
 
                     <h1

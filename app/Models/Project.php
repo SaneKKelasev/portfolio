@@ -20,7 +20,6 @@ final class Project extends Model
         'title',
         'slug',
         'description',
-        'role',
         'problem',
         'solution',
         'result',

@@ -120,7 +120,7 @@ function submit() {
                     </span>
                 </label>
 
-                <label class="flex items-start gap-3 text-sm leading-6 text-text-muted">
+                <label class="flex items-start gap-3 text-sm leading-5 text-text-muted">
                     <FormCheckbox
                         v-model="form.privacy_consent"
                         required

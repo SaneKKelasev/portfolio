@@ -65,7 +65,7 @@ defineProps({
                                bg-accent/10 px-3 py-1 text-xs font-semibold
                                uppercase tracking-wide text-accent"
                     >
-                        Демо-кейс для демонстрации структуры портфолио
+                        Демо-кейс без публичного репозитория
                     </p>
 
                     <ul class="mt-6 flex flex-wrap gap-2">

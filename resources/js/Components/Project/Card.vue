@@ -48,7 +48,7 @@ defineProps({
                     class="mb-5 text-xs font-semibold uppercase
                            tracking-[0.18em] text-accent"
                 >
-                    Избранный проект
+                    Кейс проекта
                 </p>
 
                 <h2
@@ -68,7 +68,7 @@ defineProps({
                            bg-accent/10 px-3 py-1 text-xs font-semibold
                            uppercase tracking-wide text-accent"
                 >
-                    Демо-кейс для портфолио
+                    Демо-кейс без публичного репозитория
                 </p>
 
                 <ul class="mt-6 flex flex-wrap gap-2">

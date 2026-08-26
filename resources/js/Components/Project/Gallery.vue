@@ -32,7 +32,7 @@ function selectImage(index) {
     <div class="min-w-0">
         <div
             v-if="activeImage"
-            class="relative overflow-hidden rounded-2xl border border-border-bright/70
+            class="overflow-hidden rounded-2xl border border-border-bright/70
                    bg-background/70 shadow-2xl shadow-primary/10"
         >
             <img
@@ -41,35 +41,33 @@ function selectImage(index) {
                 :alt="activeImage.alt ?? ''"
                 class="aspect-video w-full object-cover"
             >
+        </div>
 
-            <div
-                v-if="images.length > 1"
-                class="absolute inset-x-0 bottom-0 grid grid-cols-5 gap-2
-                       bg-gradient-to-t from-background via-background/80
-                       to-transparent p-3"
+        <div
+            v-if="images.length > 1"
+            class="mt-4 grid grid-cols-5 gap-4"
+        >
+            <button
+                v-for="(image, index) in thumbnails"
+                :key="image.id"
+                type="button"
+                :aria-label="`Показать изображение ${index + 1}`"
+                class="overflow-hidden rounded-xl border bg-background/60
+                       transition duration-200"
+                :class="
+                    index === activeIndex
+                        ? 'border-accent ring-2 ring-accent/30'
+                        : 'border-border hover:-translate-y-0.5 hover:border-primary/60'
+                "
+                @click="selectImage(index)"
             >
-                <button
-                    v-for="(image, index) in thumbnails"
-                    :key="image.id"
-                    type="button"
-                    :aria-label="`Показать изображение ${index + 1}`"
-                    class="overflow-hidden rounded-lg border bg-background/70
-                           transition duration-200"
-                    :class="
-                        index === activeIndex
-                            ? 'border-accent ring-2 ring-accent/30'
-                            : 'border-border hover:-translate-y-0.5 hover:border-primary/60'
-                    "
-                    @click="selectImage(index)"
+                <img
+                    :src="image.thumb_url ?? image.url"
+                    :alt="image.alt ?? ''"
+                    loading="lazy"
+                    class="aspect-video w-full object-cover"
                 >
-                    <img
-                        :src="image.thumb_url ?? image.url"
-                        :alt="image.alt ?? ''"
-                        loading="lazy"
-                        class="aspect-video w-full object-cover"
-                    >
-                </button>
-            </div>
+            </button>
         </div>
 
         <div

@@ -23,11 +23,13 @@ const props = defineProps({
 });
 
 const page = usePage();
+const maxProjectImages = 5;
 const successMessage = computed(() => page.props.flash?.success ?? null);
 const isEditing = computed(() => props.project.id !== null);
 const uploadInput = ref(null);
 const isDragging = ref(false);
 const saveFeedback = ref('');
+const galleryError = ref('');
 let saveFeedbackTimer = null;
 let uploadedImageId = 0;
 
@@ -77,6 +79,10 @@ const uploadErrors = computed(() => Object.entries(form.errors)
     .filter(([key]) => key.startsWith('uploaded_images'))
     .map(([, message]) => message));
 const visibleSaveMessage = computed(() => saveFeedback.value || successMessage.value);
+const galleryErrors = computed(() => [...new Set([
+    galleryError.value,
+    ...uploadErrors.value,
+].filter(Boolean))]);
 
 function toggleTechnology(id) {
     if (form.technologies.includes(id)) {
@@ -89,6 +95,7 @@ function toggleTechnology(id) {
 
 function removeImage(index) {
     const [item] = galleryItems.value.splice(index, 1);
+    galleryError.value = '';
 
     if (item?.type === 'upload' && item.preview) {
         URL.revokeObjectURL(item.preview);
@@ -96,8 +103,12 @@ function removeImage(index) {
 }
 
 function addFiles(files) {
-    Array.from(files)
-        .filter((file) => file.type.startsWith('image/'))
+    galleryError.value = '';
+    const imageFiles = Array.from(files).filter((file) => file.type.startsWith('image/'));
+    const remainingSlots = Math.max(maxProjectImages - galleryItems.value.length, 0);
+
+    imageFiles
+        .slice(0, remainingSlots)
         .forEach((file) => {
             uploadedImageId += 1;
             galleryItems.value.push({
@@ -108,6 +119,10 @@ function addFiles(files) {
                 alt: imageAltFromFileName(file.name),
             });
         });
+
+    if (imageFiles.length > remainingSlots) {
+        galleryError.value = `Можно добавить не больше ${maxProjectImages} изображений вместе с главным.`;
+    }
 }
 
 function imageAltFromFileName(fileName) {
@@ -129,6 +144,12 @@ function selectUploads(event) {
 }
 
 function openUploadDialog() {
+    if (galleryItems.value.length >= maxProjectImages) {
+        galleryError.value = `Можно добавить не больше ${maxProjectImages} изображений вместе с главным.`;
+
+        return;
+    }
+
     uploadInput.value?.click();
 }
 
@@ -210,6 +231,13 @@ function showSaveFeedback(message) {
 
 function submit() {
     saveFeedback.value = '';
+
+    if (galleryItems.value.length > maxProjectImages) {
+        galleryError.value = `Можно добавить не больше ${maxProjectImages} изображений вместе с главным.`;
+
+        return;
+    }
+
     syncGalleryPayload();
 
     form.transform((data) => ({
@@ -469,9 +497,12 @@ function submit() {
                         >
                         <button
                             type="button"
+                            :disabled="galleryItems.length >= maxProjectImages"
                             class="mt-4 rounded-full bg-primary px-5 py-3
                                    text-sm font-semibold text-white shadow-lg
-                                   shadow-primary/25 transition hover:bg-violet-500"
+                                   shadow-primary/25 transition
+                                   hover:bg-violet-500 disabled:cursor-not-allowed
+                                   disabled:opacity-50"
                             @click="openUploadDialog"
                         >
                             Выбрать изображения
@@ -479,18 +510,11 @@ function submit() {
                     </div>
 
                     <p class="mt-3 text-sm text-text-muted">
-                        Можно выбрать несколько файлов сразу или добавлять их по одному. Первое изображение в списке станет главным.
+                        Можно добавить до {{ maxProjectImages }} изображений вместе с главным. Первое изображение в списке станет главным.
                     </p>
 
                     <p
-                        v-if="form.errors.uploaded_images"
-                        class="mt-3 text-sm text-rose-300"
-                    >
-                        {{ form.errors.uploaded_images }}
-                    </p>
-
-                    <p
-                        v-for="error in uploadErrors"
+                        v-for="error in galleryErrors"
                         :key="error"
                         class="mt-2 text-sm text-rose-300"
                     >

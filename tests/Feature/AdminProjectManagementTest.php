@@ -233,6 +233,34 @@ final class AdminProjectManagementTest extends TestCase
         $this->assertImageSize($images[0]->thumb_path, 360, 203);
     }
 
+    public function test_admin_cannot_save_more_than_five_project_images(): void
+    {
+        Storage::fake('public');
+
+        $uploads = [];
+        $meta = [];
+
+        foreach (range(1, 6) as $index) {
+            $uploads[] = UploadedFile::fake()->image("project-{$index}.jpg", 1200, 800);
+            $meta[] = [
+                'alt' => "Project image {$index}",
+                'sort_order' => $index,
+            ];
+        }
+
+        $this->actingAs($this->user)
+            ->post('/admin/projects', [
+                'title' => 'Too Many Images',
+                'description' => 'Project with too many uploaded images.',
+                'published' => true,
+                'uploaded_images' => $uploads,
+                'uploaded_images_meta' => $meta,
+            ])
+            ->assertSessionHasErrors([
+                'uploaded_images' => 'У проекта может быть не больше 5 изображений вместе с главным.',
+            ]);
+    }
+
     public function test_admin_cannot_modify_protected_project(): void
     {
         $project = Project::factory()->create([

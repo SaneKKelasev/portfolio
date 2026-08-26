@@ -13,6 +13,8 @@ use Illuminate\Validation\Validator;
 
 final class ProjectRequest extends FormRequest
 {
+    private const MAX_IMAGES = 5;
+
     protected function prepareForValidation(): void
     {
         if (! $this->filled('slug') && is_string($this->input('title'))) {
@@ -103,7 +105,6 @@ final class ProjectRequest extends FormRequest
             ],
             'images' => [
                 'array',
-                'max:8',
             ],
             'images.*.path' => [
                 'required',
@@ -139,7 +140,6 @@ final class ProjectRequest extends FormRequest
             ],
             'uploaded_images' => [
                 'array',
-                'max:8',
             ],
             'uploaded_images.*' => [
                 'file',
@@ -149,7 +149,6 @@ final class ProjectRequest extends FormRequest
             ],
             'uploaded_images_meta' => [
                 'array',
-                'max:8',
             ],
             'uploaded_images_meta.*.alt' => [
                 'nullable',
@@ -172,10 +171,10 @@ final class ProjectRequest extends FormRequest
             $manualImages = is_array($images) ? count($images) : 0;
             $uploadedImages = count($this->uploadedImages());
 
-            if ($manualImages + $uploadedImages > 8) {
+            if ($manualImages + $uploadedImages > self::MAX_IMAGES) {
                 $validator->errors()->add(
                     'uploaded_images',
-                    'У проекта может быть не больше 8 изображений.',
+                    sprintf('У проекта может быть не больше %d изображений вместе с главным.', self::MAX_IMAGES),
                 );
             }
 
@@ -201,6 +200,19 @@ final class ProjectRequest extends FormRequest
                 );
             }
         });
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'uploaded_images.*.file' => 'Каждое изображение должно быть файлом.',
+            'uploaded_images.*.image' => 'Можно загружать только изображения.',
+            'uploaded_images.*.mimes' => 'Изображения должны быть в формате JPG, PNG или WebP.',
+            'uploaded_images.*.max' => 'Размер одного изображения не должен превышать 4 МБ.',
+        ];
     }
 
     /**

@@ -36,9 +36,12 @@ defineProps({
 
         <div
             class="relative grid gap-10 p-6
-                   sm:p-8
-                   lg:grid-cols-[0.82fr_1.18fr] lg:items-center lg:p-12"
-            :class="{ 'lg:[&>*:first-child]:order-2': reverse }"
+                   sm:p-8 lg:items-center lg:p-12"
+            :class="
+                reverse
+                    ? 'lg:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)] lg:[&>*:first-child]:order-2'
+                    : 'lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]'
+            "
         >
             <div class="max-w-xl">
                 <p

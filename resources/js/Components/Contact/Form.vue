@@ -1,4 +1,7 @@
 <script setup>
+import FormCheckbox from '@/Components/Form/Checkbox.vue';
+import FormInput from '@/Components/Form/Input.vue';
+import FormTextarea from '@/Components/Form/Textarea.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -63,16 +66,13 @@ function submit() {
                         <span class="text-sm font-medium text-text">
                             Имя *
                         </span>
-                        <input
+                        <FormInput
                             v-model="form.name"
                             type="text"
                             autocomplete="name"
-                            class="mt-2 w-full rounded-2xl border border-border
-                                   bg-background/70 px-4 py-3 text-text outline-none
-                                   transition placeholder:text-text-muted/60
-                                   focus:border-accent"
+                            :invalid="Boolean(form.errors.name)"
                             placeholder="Александр"
-                        >
+                        />
                         <span
                             v-if="form.errors.name"
                             class="mt-2 block text-sm text-rose-300"
@@ -85,16 +85,13 @@ function submit() {
                         <span class="text-sm font-medium text-text">
                             Email *
                         </span>
-                        <input
+                        <FormInput
                             v-model="form.email"
                             type="email"
                             autocomplete="email"
-                            class="mt-2 w-full rounded-2xl border border-border
-                                   bg-background/70 px-4 py-3 text-text outline-none
-                                   transition placeholder:text-text-muted/60
-                                   focus:border-accent"
+                            :invalid="Boolean(form.errors.email)"
                             placeholder="mail@example.com"
-                        >
+                        />
                         <span
                             v-if="form.errors.email"
                             class="mt-2 block text-sm text-rose-300"
@@ -108,13 +105,11 @@ function submit() {
                     <span class="text-sm font-medium text-text">
                         Сообщение *
                     </span>
-                    <textarea
+                    <FormTextarea
                         v-model="form.message"
                         rows="5"
-                        class="mt-2 min-h-36 max-h-56 w-full resize-y rounded-2xl border
-                               border-border bg-background/70 px-4 py-3
-                               text-text outline-none transition
-                               placeholder:text-text-muted/60 focus:border-accent"
+                        class="max-h-56"
+                        :invalid="Boolean(form.errors.message)"
                         placeholder="Коротко опишите задачу"
                     />
                     <span
@@ -126,12 +121,10 @@ function submit() {
                 </label>
 
                 <label class="flex items-start gap-3 text-sm leading-6 text-text-muted">
-                    <input
+                    <FormCheckbox
                         v-model="form.privacy_consent"
-                        type="checkbox"
-                        class="mt-1"
                         required
-                    >
+                    />
                     <span>
                         Я согласен на обработку персональных данных для ответа на это сообщение.
                     </span>

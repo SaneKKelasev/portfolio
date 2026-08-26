@@ -1,4 +1,5 @@
 <script setup>
+import FormInput from '@/Components/Form/Input.vue';
 import ProjectCard from '@/Components/Project/Card.vue';
 import SiteHeader from '@/Components/SiteHeader.vue';
 import { Head, router } from '@inertiajs/vue3';
@@ -98,15 +99,11 @@ function selectTechnology(slug) {
                 <div class="grid gap-6 xl:grid-cols-[minmax(22rem,0.9fr)_1fr]">
                     <label class="block">
                         <span class="text-sm font-semibold text-text">Поиск</span>
-                        <input
+                        <FormInput
                             v-model="search"
                             type="search"
-                            class="mt-2 w-full rounded-2xl border border-border
-                                   bg-background/70 px-4 py-3 text-text outline-none
-                                   transition placeholder:text-text-muted/60
-                                   focus:border-accent"
                             placeholder="Название или описание проекта"
-                        >
+                        />
                     </label>
 
                     <div>

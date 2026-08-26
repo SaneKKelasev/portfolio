@@ -2,7 +2,7 @@
 import FormInput from '@/Components/Form/Input.vue';
 import ProjectCard from '@/Components/Project/Card.vue';
 import SiteHeader from '@/Components/SiteHeader.vue';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 
 const props = defineProps({
@@ -75,12 +75,23 @@ function selectTechnology(slug) {
 
         <section class="mx-auto w-full max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
             <header class="max-w-3xl">
-                <p
-                    class="text-xs font-semibold uppercase tracking-[0.18em]
-                           text-accent"
-                >
-                    Каталог
-                </p>
+                <div class="flex flex-wrap items-center gap-4">
+                    <p
+                        class="text-xs font-semibold uppercase tracking-[0.18em]
+                               text-accent"
+                    >
+                        Каталог
+                    </p>
+                    <Link
+                        href="/"
+                        class="inline-flex items-center gap-2 rounded-full border
+                               border-border-bright/70 px-4 py-2 text-sm
+                               font-semibold text-text-muted transition
+                               hover:border-accent/70 hover:text-white"
+                    >
+                        ← На главную
+                    </Link>
+                </div>
 
                 <h1 class="mt-4 text-4xl font-semibold text-text sm:text-6xl">
                     Все проекты
@@ -108,13 +119,13 @@ function selectTechnology(slug) {
 
                     <div>
                         <p class="text-sm font-semibold text-text">Технологии</p>
-                        <div class="mt-2 flex flex-wrap gap-2">
+                        <div class="mt-2 flex min-h-14 flex-wrap items-center gap-2">
                             <button
                                 v-for="technology in technologies"
                                 :key="technology.slug"
                                 type="button"
-                                class="rounded-full border px-4 py-3 text-sm
-                                       font-semibold transition"
+                                class="min-h-14 rounded-2xl border px-5 py-3
+                                       text-sm font-semibold transition"
                                 :class="
                                     filters.technology === technology.slug
                                         ? 'border-accent bg-accent/10 text-accent'

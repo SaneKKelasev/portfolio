@@ -437,7 +437,10 @@ function submit() {
 
             <section class="rounded-3xl border border-border bg-surface/75 p-6">
                 <div class="flex flex-wrap items-center justify-between gap-4">
-                    <h2 class="text-xl font-semibold text-text">Технологии</h2>
+                    <h2 class="flex items-center gap-2 text-xl font-semibold text-text">
+                        Технологии
+                        <span :class="optionalBadgeClass">Необязательно</span>
+                    </h2>
                     <Link
                         href="/admin/technologies"
                         class="text-sm font-semibold text-accent transition
@@ -466,7 +469,10 @@ function submit() {
 
             <section class="rounded-3xl border border-border bg-surface/75 p-6">
                 <div class="flex items-center justify-between gap-4">
-                    <h2 class="text-xl font-semibold text-text">Изображения</h2>
+                    <h2 class="flex items-center gap-2 text-xl font-semibold text-text">
+                        Изображения
+                        <span :class="optionalBadgeClass">Необязательно</span>
+                    </h2>
                 </div>
 
                 <div

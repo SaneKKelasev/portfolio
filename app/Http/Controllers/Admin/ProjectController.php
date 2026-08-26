@@ -161,7 +161,10 @@ final class ProjectController extends Controller
             'technologies' => $project->technologies?->pluck('id')->all() ?? [],
             'images' => $project->images?->map(fn ($image): array => [
                 'path' => $image->path,
-                'url' => Storage::disk('public')->url($image->path),
+                'large_path' => $image->large_path,
+                'card_path' => $image->card_path,
+                'thumb_path' => $image->thumb_path,
+                'url' => Storage::disk('public')->url($image->thumb_path ?? $image->path),
                 'alt' => $image->alt,
                 'sort_order' => $image->sort_order,
             ])->values()->all() ?? [],

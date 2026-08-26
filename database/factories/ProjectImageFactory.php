@@ -21,8 +21,13 @@ final class ProjectImageFactory extends Factory
      */
     public function definition(): array
     {
+        $basePath = sprintf('projects/tests/%s', fake()->unique()->uuid());
+
         return [
-            'path' => sprintf('projects/tests/%s.webp', fake()->unique()->uuid()),
+            'path' => "{$basePath}/large.webp",
+            'large_path' => "{$basePath}/large.webp",
+            'card_path' => "{$basePath}/card.webp",
+            'thumb_path' => "{$basePath}/thumb.webp",
             'alt' => fake()->sentence(),
             'sort_order' => fake()->unique()->numberBetween(1, 10_000),
         ];

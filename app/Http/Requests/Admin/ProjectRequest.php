@@ -110,6 +110,21 @@ final class ProjectRequest extends FormRequest
                 'string',
                 'max:2048',
             ],
+            'images.*.large_path' => [
+                'nullable',
+                'string',
+                'max:2048',
+            ],
+            'images.*.card_path' => [
+                'nullable',
+                'string',
+                'max:2048',
+            ],
+            'images.*.thumb_path' => [
+                'nullable',
+                'string',
+                'max:2048',
+            ],
             'images.*.alt' => [
                 'nullable',
                 'string',
@@ -226,7 +241,7 @@ final class ProjectRequest extends FormRequest
     }
 
     /**
-     * @return list<array{path: string, alt?: string|null, sort_order: int}>
+     * @return list<array{path: string, large_path?: string|null, card_path?: string|null, thumb_path?: string|null, alt?: string|null, sort_order: int}>
      */
     public function images(): array
     {

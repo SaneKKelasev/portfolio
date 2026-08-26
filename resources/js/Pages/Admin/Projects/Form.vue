@@ -53,6 +53,9 @@ const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
     id: `existing-${image.path}`,
     type: 'existing',
     path: image.path,
+    large_path: image.large_path,
+    card_path: image.card_path,
+    thumb_path: image.thumb_path,
     url: image.url,
     alt: image.alt ?? '',
     sort_order: image.sort_order ?? index + 1,
@@ -176,6 +179,9 @@ function syncGalleryPayload() {
             existingImages.push({
                 ...imageData,
                 path: item.path,
+                large_path: item.large_path,
+                card_path: item.card_path,
+                thumb_path: item.thumb_path,
             });
             return;
         }

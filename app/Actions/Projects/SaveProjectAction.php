@@ -9,15 +9,18 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use RuntimeException;
 use Throwable;
 
 final class SaveProjectAction
 {
+    public function __construct(
+        private readonly ProjectImageProcessor $imageProcessor,
+    ) {}
+
     /**
      * @param  array<string, mixed>  $data
      * @param  list<int>  $technologyIds
-     * @param  list<array{path: string, alt?: string|null, sort_order: int}>  $images
+     * @param  list<array{path: string, large_path?: string|null, card_path?: string|null, thumb_path?: string|null, alt?: string|null, sort_order: int}>  $images
      * @param  list<UploadedFile>  $uploadedImages
      * @param  list<array{alt?: string|null, sort_order: int}>  $uploadedImageMeta
      */
@@ -39,12 +42,15 @@ final class SaveProjectAction
                 $project->technologies()->sync($technologyIds);
 
                 foreach ($uploadedImages as $index => $file) {
-                    $path = $this->storeUploadedImage($project, $file);
-                    $storedPaths[] = $path;
+                    $paths = $this->imageProcessor->process($project, $file);
+                    $storedPaths = [
+                        ...$storedPaths,
+                        ...array_unique(array_values($paths)),
+                    ];
                     $meta = $uploadedImageMeta[$index] ?? [];
 
                     $images[] = [
-                        'path' => $path,
+                        ...$paths,
                         'alt' => $meta['alt'] ?? $this->imageAlt($file),
                         'sort_order' => $meta['sort_order'] ?? $this->nextImageSortOrder($images),
                     ];
@@ -65,25 +71,6 @@ final class SaveProjectAction
         }
     }
 
-    private function storeUploadedImage(Project $project, UploadedFile $file): string
-    {
-        $baseName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $slug = Str::slug($baseName) ?: 'image';
-        $extension = $file->extension() ?: $file->guessExtension() ?: 'jpg';
-
-        $path = $file->storeAs(
-            "projects/{$project->slug}",
-            sprintf('%s-%s.%s', $slug, Str::uuid(), $extension),
-            'public',
-        );
-
-        if (! is_string($path)) {
-            throw new RuntimeException('Project image upload failed.');
-        }
-
-        return $path;
-    }
-
     private function imageAlt(UploadedFile $file): string
     {
         $baseName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -98,7 +85,7 @@ final class SaveProjectAction
     }
 
     /**
-     * @param  list<array{path: string, alt?: string|null, sort_order: int}>  $images
+     * @param  list<array{path: string, large_path?: string|null, card_path?: string|null, thumb_path?: string|null, alt?: string|null, sort_order: int}>  $images
      */
     private function nextImageSortOrder(array $images): int
     {

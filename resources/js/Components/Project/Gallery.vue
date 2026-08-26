@@ -57,7 +57,7 @@ function selectImage(index) {
                 @click="selectImage(index)"
             >
                 <img
-                    :src="image.url"
+                    :src="image.thumb_url ?? image.url"
                     :alt="image.alt ?? ''"
                     loading="lazy"
                     class="aspect-[3/2] w-full object-contain"

@@ -37,7 +37,9 @@ final class ProjectDetailResource extends JsonResource
             'images' => $this->images->map(
                 static fn (ProjectImage $image): array => [
                     'id' => $image->id,
-                    'url' => Storage::disk('public')->url($image->path),
+                    'url' => Storage::disk('public')->url($image->large_path ?? $image->path),
+                    'card_url' => Storage::disk('public')->url($image->card_path ?? $image->path),
+                    'thumb_url' => Storage::disk('public')->url($image->thumb_path ?? $image->path),
                     'alt' => $image->alt,
                 ],
             ),

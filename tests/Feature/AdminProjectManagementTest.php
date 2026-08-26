@@ -209,7 +209,7 @@ final class AdminProjectManagementTest extends TestCase
             ->assertRedirect();
 
         $project = Project::query()->where('slug', 'uploaded-project')->firstOrFail();
-        $images = $project->images()->get();
+        $images = $project->images()->orderBy('sort_order')->get();
 
         $this->assertCount(2, $images);
         $this->assertSame('Detail view', $images[0]->alt);
@@ -217,8 +217,20 @@ final class AdminProjectManagementTest extends TestCase
         $this->assertSame('Cover image', $images[1]->alt);
         $this->assertSame(2, $images[1]->sort_order);
         $this->assertStringStartsWith('projects/uploaded-project/detail-view-', $images[0]->path);
-        Storage::disk('public')->assertExists($images[0]->path);
-        Storage::disk('public')->assertExists($images[1]->path);
+        $this->assertStringEndsWith('-large.webp', $images[0]->path);
+
+        foreach ($images as $image) {
+            $this->assertNotNull($image->large_path);
+            $this->assertNotNull($image->card_path);
+            $this->assertNotNull($image->thumb_path);
+            Storage::disk('public')->assertExists($image->large_path);
+            Storage::disk('public')->assertExists($image->card_path);
+            Storage::disk('public')->assertExists($image->thumb_path);
+        }
+
+        $this->assertImageSize($images[0]->large_path, 1200, 675);
+        $this->assertImageSize($images[0]->card_path, 900, 506);
+        $this->assertImageSize($images[0]->thumb_path, 360, 203);
     }
 
     public function test_admin_cannot_modify_protected_project(): void
@@ -249,5 +261,15 @@ final class AdminProjectManagementTest extends TestCase
             'id' => $project->id,
             'title' => $project->title,
         ]);
+    }
+
+    private function assertImageSize(string $path, int $width, int $height): void
+    {
+        $size = getimagesize(Storage::disk('public')->path($path));
+
+        $this->assertIsArray($size);
+        $this->assertSame($width, $size[0]);
+        $this->assertSame($height, $size[1]);
+        $this->assertSame('image/webp', $size['mime']);
     }
 }

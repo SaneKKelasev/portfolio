@@ -16,6 +16,9 @@ final class ProjectImage extends Model
 
     protected $fillable = [
         'path',
+        'large_path',
+        'card_path',
+        'thumb_path',
         'alt',
         'sort_order',
     ];

@@ -30,6 +30,19 @@ final class StoreContactMessageRequest extends FormRequest
                 'min:20',
                 'max:3000',
             ],
+            'privacy_consent' => [
+                'accepted',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'privacy_consent.accepted' => 'Подтвердите согласие на обработку персональных данных.',
         ];
     }
 }

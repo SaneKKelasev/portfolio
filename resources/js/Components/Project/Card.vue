@@ -62,6 +62,15 @@ defineProps({
                     {{ project.description }}
                 </p>
 
+                <p
+                    v-if="!project.website_url && !project.repository_url"
+                    class="mt-4 inline-flex rounded-full border border-accent/40
+                           bg-accent/10 px-3 py-1 text-xs font-semibold
+                           uppercase tracking-wide text-accent"
+                >
+                    Демо-кейс для портфолио
+                </p>
+
                 <ul class="mt-6 flex flex-wrap gap-2">
                     <li
                         v-for="technology in project.technologies"

@@ -8,6 +8,7 @@ const form = useForm({
     name: '',
     email: '',
     message: '',
+    privacy_consent: false,
 });
 
 const successMessage = computed(() => page.props.flash?.success ?? null);
@@ -44,8 +45,7 @@ function submit() {
 
                 <p class="mt-5 max-w-xl leading-8 text-text-muted">
                     Напишите, если нужен Laravel-разработчик, ревью проекта или
-                    помощь с fullstack-задачей. Сообщение сохранится в системе,
-                    а форма покажет состояние отправки и ошибки валидации.
+                    помощь с fullstack-задачей. Я отвечу на указанную почту.
                 </p>
             </div>
 
@@ -61,7 +61,7 @@ function submit() {
                 <div class="grid gap-5 sm:grid-cols-2">
                     <label class="block">
                         <span class="text-sm font-medium text-text">
-                            Имя
+                            Имя *
                         </span>
                         <input
                             v-model="form.name"
@@ -83,7 +83,7 @@ function submit() {
 
                     <label class="block">
                         <span class="text-sm font-medium text-text">
-                            Email
+                            Email *
                         </span>
                         <input
                             v-model="form.email"
@@ -106,12 +106,12 @@ function submit() {
 
                 <label class="block">
                     <span class="text-sm font-medium text-text">
-                        Сообщение
+                        Сообщение *
                     </span>
                     <textarea
                         v-model="form.message"
                         rows="5"
-                        class="mt-2 w-full resize-y rounded-2xl border
+                        class="mt-2 min-h-36 max-h-56 w-full resize-y rounded-2xl border
                                border-border bg-background/70 px-4 py-3
                                text-text outline-none transition
                                placeholder:text-text-muted/60 focus:border-accent"
@@ -124,6 +124,24 @@ function submit() {
                         {{ form.errors.message }}
                     </span>
                 </label>
+
+                <label class="flex items-start gap-3 text-sm leading-6 text-text-muted">
+                    <input
+                        v-model="form.privacy_consent"
+                        type="checkbox"
+                        class="mt-1"
+                        required
+                    >
+                    <span>
+                        Я согласен на обработку персональных данных для ответа на это сообщение.
+                    </span>
+                </label>
+                <span
+                    v-if="form.errors.privacy_consent"
+                    class="-mt-3 block text-sm text-rose-300"
+                >
+                    {{ form.errors.privacy_consent }}
+                </span>
 
                 <button
                     type="submit"

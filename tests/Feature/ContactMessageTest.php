@@ -18,6 +18,7 @@ final class ContactMessageTest extends TestCase
                 'name' => 'Alexander',
                 'email' => 'alexander@example.com',
                 'message' => 'Hello, I would like to discuss a Laravel project.',
+                'privacy_consent' => '1',
             ])
             ->assertRedirect('/')
             ->assertSessionHas('success');
@@ -36,12 +37,14 @@ final class ContactMessageTest extends TestCase
                 'name' => '',
                 'email' => 'not-an-email',
                 'message' => 'Too short',
+                'privacy_consent' => '',
             ])
             ->assertRedirect('/')
             ->assertInvalid([
                 'name',
                 'email',
                 'message',
+                'privacy_consent',
             ]);
 
         $this->assertDatabaseCount('contact_messages', 0);

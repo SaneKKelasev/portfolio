@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import { VueDatePicker } from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { computed, ref } from 'vue';
@@ -22,15 +22,11 @@ const props = defineProps({
     },
 });
 
-const page = usePage();
 const maxProjectImages = 5;
-const successMessage = computed(() => page.props.flash?.success ?? null);
 const isEditing = computed(() => props.project.id !== null);
 const uploadInput = ref(null);
 const isDragging = ref(false);
-const saveFeedback = ref('');
 const galleryError = ref('');
-let saveFeedbackTimer = null;
 let uploadedImageId = 0;
 
 const form = useForm({
@@ -78,7 +74,6 @@ const russianDayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 const uploadErrors = computed(() => Object.entries(form.errors)
     .filter(([key]) => key.startsWith('uploaded_images'))
     .map(([, message]) => message));
-const visibleSaveMessage = computed(() => saveFeedback.value || successMessage.value);
 const galleryErrors = computed(() => [...new Set([
     galleryError.value,
     ...uploadErrors.value,
@@ -216,22 +211,7 @@ function syncGalleryPayload() {
     form.uploaded_images_meta = uploadedImagesMeta;
 }
 
-function showSaveFeedback(message) {
-    saveFeedback.value = message;
-
-    if (saveFeedbackTimer) {
-        clearTimeout(saveFeedbackTimer);
-    }
-
-    saveFeedbackTimer = setTimeout(() => {
-        saveFeedback.value = '';
-        saveFeedbackTimer = null;
-    }, 5000);
-}
-
 function submit() {
-    saveFeedback.value = '';
-
     if (galleryItems.value.length > maxProjectImages) {
         galleryError.value = `Можно добавить не больше ${maxProjectImages} изображений вместе с главным.`;
 
@@ -250,21 +230,12 @@ function submit() {
         form.post(`/admin/projects/${props.project.id}`, {
             forceFormData: true,
             preserveScroll: true,
-            onSuccess: () => {
-                showSaveFeedback('Проект сохранён. Изменения уже применены.');
-                form.uploaded_images = [];
-                form.uploaded_images_meta = [];
-                if (uploadInput.value) {
-                    uploadInput.value.value = '';
-                }
-            },
         });
         return;
     }
 
     form.post('/admin/projects', {
         forceFormData: true,
-        onSuccess: () => showSaveFeedback('Проект создан. Можно продолжить редактирование.'),
     });
 }
 </script>
@@ -289,14 +260,6 @@ function submit() {
                 {{ isEditing ? 'Редактирование проекта' : 'Новый проект' }}
             </h1>
         </header>
-
-        <div
-            v-if="successMessage"
-            class="mt-6 rounded-2xl border border-success/40 bg-success/10
-                   px-4 py-3 text-sm font-semibold text-success"
-        >
-            {{ successMessage }}
-        </div>
 
         <div
             v-if="hasErrors"
@@ -588,27 +551,15 @@ function submit() {
                 </div>
             </section>
 
-            <div class="flex flex-wrap items-center gap-4">
-                <button
-                    type="submit"
-                    :disabled="form.processing"
-                    class="rounded-full bg-primary px-6 py-3 text-sm font-semibold
-                           text-white shadow-lg shadow-primary/25 transition
-                           hover:bg-violet-500 disabled:opacity-60"
-                >
-                    {{ form.processing ? 'Сохранение...' : 'Сохранить проект' }}
-                </button>
-
-                <p
-                    v-if="visibleSaveMessage"
-                    class="rounded-full border border-success/40 bg-success/10
-                           px-4 py-3 text-sm font-semibold text-success"
-                    role="status"
-                    aria-live="polite"
-                >
-                    {{ visibleSaveMessage }}
-                </p>
-            </div>
+            <button
+                type="submit"
+                :disabled="form.processing"
+                class="rounded-full bg-primary px-6 py-3 text-sm font-semibold
+                       text-white shadow-lg shadow-primary/25 transition
+                       hover:bg-violet-500 disabled:opacity-60"
+            >
+                {{ form.processing ? 'Сохранение...' : 'Сохранить проект' }}
+            </button>
         </form>
     </AdminLayout>
 </template>

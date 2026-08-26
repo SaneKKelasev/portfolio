@@ -57,7 +57,7 @@ final class ProjectController extends Controller
             $request->uploadedImageMeta(),
         );
 
-        return redirect("/admin/projects/{$project->id}/edit")
+        return redirect('/admin/projects')
             ->with('success', 'Проект создан.');
     }
 
@@ -93,7 +93,8 @@ final class ProjectController extends Controller
             $request->uploadedImageMeta(),
         );
 
-        return back()->with('success', 'Проект обновлён.');
+        return redirect('/admin/projects')
+            ->with('success', 'Проект обновлён.');
     }
 
     public function destroy(Project $project): RedirectResponse

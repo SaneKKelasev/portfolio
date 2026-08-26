@@ -10,6 +10,16 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
+    --color-background: #070912;
+    --color-surface: #0d1020;
+    --color-surface-strong: #13172a;
+    --color-border: #2c3147;
+    --color-border-bright: #8b8fa3;
+    --color-primary: #8b5cf6;
+    --color-accent: #22d3ee;
+    --color-success: #34d399;
+    --color-text: #f8fafc;
+    --color-text-muted: #b6c0d4;
 }
 
 @layer base {
@@ -19,7 +29,10 @@
 
     body {
         min-width: 320px;
-        background: #080b14;
+        background:
+            radial-gradient(circle at 20% 0%, rgb(139 92 246 / 14%), transparent 30rem),
+            radial-gradient(circle at 82% 12%, rgb(34 211 238 / 10%), transparent 28rem),
+            linear-gradient(180deg, #080a14 0%, #070912 45%, #05060b 100%);
         color: #f8fafc;
         font-family:
             'Instrument Sans',
@@ -28,6 +41,11 @@
             sans-serif;
         -webkit-font-smoothing: antialiased;
         text-rendering: optimizeLegibility;
+    }
+
+    ::selection {
+        background: rgb(139 92 246 / 35%);
+        color: #ffffff;
     }
 
     button,

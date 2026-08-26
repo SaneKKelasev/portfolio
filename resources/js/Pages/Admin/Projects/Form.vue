@@ -62,6 +62,9 @@ const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
 const textareaClass = 'mt-2 w-full min-h-36 max-h-72 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 const caseTextareaClass = 'mt-2 w-full min-h-40 max-h-80 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 const datePickerClass = 'portfolio-date-picker mt-2';
+const labelClass = 'flex items-center gap-2 text-sm font-semibold text-text';
+const requiredBadgeClass = 'rounded-full bg-accent/10 px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-wide text-accent';
+const optionalBadgeClass = 'rounded-full border border-border px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-wide text-text-muted';
 const datePickerFormats = {
     input: 'dd.MM.yyyy',
 };
@@ -275,9 +278,13 @@ function submit() {
                        bg-surface/75 p-6 lg:grid-cols-2"
             >
                 <label class="block lg:col-span-2">
-                    <span class="text-sm font-semibold text-text">Название</span>
+                    <span :class="labelClass">
+                        Название
+                        <span :class="requiredBadgeClass">Обязательно</span>
+                    </span>
                     <input
                         v-model="form.title"
+                        required
                         class="mt-2 w-full rounded-2xl border border-border
                                bg-background/70 px-4 py-3 text-text outline-none
                                focus:border-accent"
@@ -291,9 +298,13 @@ function submit() {
                 </label>
 
                 <label class="block lg:col-span-2">
-                    <span class="text-sm font-semibold text-text">Описание</span>
+                    <span :class="labelClass">
+                        Описание
+                        <span :class="requiredBadgeClass">Обязательно</span>
+                    </span>
                     <textarea
                         v-model="form.description"
+                        required
                         rows="4"
                         :class="textareaClass"
                     />
@@ -303,7 +314,10 @@ function submit() {
                 </label>
 
                 <label class="block">
-                    <span class="text-sm font-semibold text-text">Сайт</span>
+                    <span :class="labelClass">
+                        Сайт
+                        <span :class="optionalBadgeClass">Необязательно</span>
+                    </span>
                     <input
                         v-model="form.website_url"
                         class="mt-2 w-full rounded-2xl border border-border
@@ -316,7 +330,10 @@ function submit() {
                 </label>
 
                 <label class="block">
-                    <span class="text-sm font-semibold text-text">Репозиторий</span>
+                    <span :class="labelClass">
+                        Репозиторий
+                        <span :class="optionalBadgeClass">Необязательно</span>
+                    </span>
                     <input
                         v-model="form.repository_url"
                         class="mt-2 w-full rounded-2xl border border-border
@@ -329,7 +346,10 @@ function submit() {
                 </label>
 
                 <label class="block">
-                    <span class="text-sm font-semibold text-text">Начало</span>
+                    <span :class="labelClass">
+                        Начало
+                        <span :class="optionalBadgeClass">Необязательно</span>
+                    </span>
 
                    <VueDatePicker
                         v-model="form.started_at"
@@ -354,7 +374,10 @@ function submit() {
                 </label>
 
                <label class="block">
-                    <span class="text-sm font-semibold text-text">Завершение</span>
+                    <span :class="labelClass">
+                        Завершение
+                        <span :class="optionalBadgeClass">Необязательно</span>
+                    </span>
 
                    <VueDatePicker
                         v-model="form.finished_at"
@@ -390,15 +413,24 @@ function submit() {
                        bg-surface/75 p-6 lg:grid-cols-3"
             >
                 <label class="block">
-                    <span class="text-sm font-semibold text-text">Задача</span>
+                    <span :class="labelClass">
+                        Задача
+                        <span :class="optionalBadgeClass">Необязательно</span>
+                    </span>
                     <textarea v-model="form.problem" rows="6" :class="caseTextareaClass" />
                 </label>
                 <label class="block">
-                    <span class="text-sm font-semibold text-text">Решение</span>
+                    <span :class="labelClass">
+                        Решение
+                        <span :class="optionalBadgeClass">Необязательно</span>
+                    </span>
                     <textarea v-model="form.solution" rows="6" :class="caseTextareaClass" />
                 </label>
                 <label class="block">
-                    <span class="text-sm font-semibold text-text">Результат</span>
+                    <span :class="labelClass">
+                        Результат
+                        <span :class="optionalBadgeClass">Необязательно</span>
+                    </span>
                     <textarea v-model="form.result" rows="6" :class="caseTextareaClass" />
                 </label>
             </section>

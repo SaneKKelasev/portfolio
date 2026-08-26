@@ -34,7 +34,7 @@ function selectImage(index) {
                 :key="activeImage.id"
                 :src="activeImage.url"
                 :alt="activeImage.alt ?? ''"
-                class="aspect-[3/2] w-full object-contain"
+                class="aspect-video w-full object-cover"
             >
         </div>
 
@@ -60,14 +60,14 @@ function selectImage(index) {
                     :src="image.thumb_url ?? image.url"
                     :alt="image.alt ?? ''"
                     loading="lazy"
-                    class="aspect-[3/2] w-full object-contain"
+                    class="aspect-video w-full object-cover"
                 >
             </button>
         </div>
 
         <div
             v-if="images.length === 0"
-            class="flex aspect-[3/2] items-center justify-center rounded-2xl
+            class="flex aspect-video items-center justify-center rounded-2xl
                    border border-dashed border-border bg-background/30
                    px-6 text-center text-sm text-text-muted"
         >

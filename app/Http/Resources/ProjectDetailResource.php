@@ -24,7 +24,6 @@ final class ProjectDetailResource extends JsonResource
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->description,
-            'role' => $this->role,
             'problem' => $this->problem,
             'solution' => $this->solution,
             'result' => $this->result,

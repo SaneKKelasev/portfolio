@@ -133,7 +133,6 @@ final class AdminProjectManagementTest extends TestCase
             ->put("/admin/projects/{$project->id}", [
                 'title' => 'Updated title',
                 'description' => 'Updated description.',
-                'role' => null,
                 'problem' => null,
                 'solution' => null,
                 'result' => null,

@@ -148,7 +148,6 @@ final class ProjectController extends Controller
             'title' => $project->title,
             'slug' => $project->slug,
             'description' => $project->description,
-            'role' => $project->role,
             'problem' => $project->problem,
             'solution' => $project->solution,
             'result' => $project->result,

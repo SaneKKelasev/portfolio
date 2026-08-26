@@ -28,11 +28,6 @@ class ProjectFactory extends Factory
             'title' => $title,
             'slug' => Str::slug($title).'-'.fake()->unique()->numberBetween(1, 1_000_000),
             'description' => fake()->paragraphs(3, true),
-            'role' => fake()->randomElement([
-                'Fullstack developer',
-                'Backend developer',
-                'Laravel developer',
-            ]),
             'problem' => fake()->paragraph(),
             'solution' => fake()->paragraph(),
             'result' => fake()->paragraph(),

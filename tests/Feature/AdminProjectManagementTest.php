@@ -34,10 +34,12 @@ final class AdminProjectManagementTest extends TestCase
             'title' => 'Admin visible project',
             'published_at' => now(),
             'is_protected' => true,
+            'updated_at' => now(),
         ]);
         Project::factory()->create([
             'title' => 'Draft project',
             'published_at' => null,
+            'updated_at' => now()->subMinute(),
         ]);
 
         $this->actingAs($this->user)
@@ -260,7 +262,7 @@ final class AdminProjectManagementTest extends TestCase
             ]);
     }
 
-    public function test_admin_cannot_modify_protected_project(): void
+    public function test_demo_admin_cannot_modify_protected_project(): void
     {
         $project = Project::factory()->create([
             'slug' => 'protected-project',
@@ -287,6 +289,34 @@ final class AdminProjectManagementTest extends TestCase
         $this->assertDatabaseHas('projects', [
             'id' => $project->id,
             'title' => $project->title,
+        ]);
+    }
+
+    public function test_owner_can_modify_protected_project(): void
+    {
+        $owner = User::factory()->owner()->create();
+        $project = Project::factory()->create([
+            'title' => 'Protected project',
+            'slug' => 'protected-project',
+            'is_protected' => true,
+        ]);
+
+        $this->actingAs($owner)
+            ->get("/admin/projects/{$project->id}/edit")
+            ->assertOk();
+
+        $this->actingAs($owner)
+            ->put("/admin/projects/{$project->id}", [
+                'title' => 'Updated protected project',
+                'description' => 'Owner can update protected portfolio projects.',
+                'published' => true,
+            ])
+            ->assertRedirect('/admin/projects');
+
+        $this->assertDatabaseHas('projects', [
+            'id' => $project->id,
+            'title' => 'Updated protected project',
+            'slug' => 'updated-protected-project',
         ]);
     }
 

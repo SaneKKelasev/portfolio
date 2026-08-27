@@ -58,7 +58,7 @@ function submitEdit(technology) {
 }
 
 function destroyTechnology(technology) {
-    if (technology.has_protected_projects || technology.projects_count > 0) {
+    if (!technology.can_delete) {
         return;
     }
 
@@ -218,7 +218,7 @@ function destroyTechnology(technology) {
                     <template v-else>
                         <button
                             type="button"
-                            :disabled="technology.has_protected_projects"
+                            :disabled="!technology.can_update"
                             class="rounded-full border border-border px-4 py-2
                                    text-sm font-semibold text-text-muted
                                    transition enabled:hover:border-accent/70
@@ -229,7 +229,7 @@ function destroyTechnology(technology) {
                         </button>
                         <button
                             type="button"
-                            :disabled="technology.has_protected_projects || technology.projects_count > 0"
+                            :disabled="!technology.can_delete"
                             class="rounded-full border border-rose-400/50 px-4 py-2
                                    text-sm font-semibold text-rose-300 transition
                                    enabled:hover:border-rose-300 enabled:hover:text-rose-200

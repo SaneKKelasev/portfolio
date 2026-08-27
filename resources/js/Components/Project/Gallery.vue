@@ -92,7 +92,7 @@ onBeforeUnmount(() => {
             v-if="activeImage"
             type="button"
             aria-label="Открыть изображение на весь экран"
-            class="block w-full overflow-hidden rounded-2xl border border-border-bright/70
+            class="group relative block w-full cursor-zoom-in overflow-hidden rounded-2xl border border-border-bright/70
                    bg-background/70 shadow-2xl shadow-primary/10
                    transition hover:border-accent/70"
             @click="openLightbox"
@@ -103,6 +103,23 @@ onBeforeUnmount(() => {
                 :alt="activeImage.alt ?? ''"
                 class="aspect-video w-full object-contain"
             >
+            <span
+                class="absolute inset-0 flex items-center justify-center
+                       bg-background/0 opacity-0 transition duration-200
+                       group-hover:bg-background/45 group-hover:opacity-100"
+            >
+                <span
+                    class="inline-flex items-center gap-2 rounded-full border
+                           border-border-bright/70 bg-surface/85 px-4 py-2
+                           text-sm font-semibold text-white shadow-xl
+                           shadow-black/30"
+                >
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none">
+                        <path d="M7 3H3v4M13 3h4v4M7 17H3v-4M13 17h4v-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    На весь экран
+                </span>
+            </span>
         </button>
 
         <div
@@ -114,7 +131,7 @@ onBeforeUnmount(() => {
                 :key="image.id"
                 type="button"
                 :aria-label="`Показать изображение ${index + 1}`"
-                class="overflow-hidden rounded-xl border bg-background/60
+                class="cursor-pointer overflow-hidden rounded-xl border bg-background/60
                        transition duration-200"
                 :class="
                     index === activeIndex

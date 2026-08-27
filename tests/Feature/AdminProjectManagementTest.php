@@ -229,9 +229,41 @@ final class AdminProjectManagementTest extends TestCase
             Storage::disk('public')->assertExists($image->thumb_path);
         }
 
-        $this->assertImageSize($images[0]->large_path, 1200, 675);
+        $this->assertImageSize($images[0]->large_path, 1600, 900);
         $this->assertImageSize($images[0]->card_path, 900, 506);
         $this->assertImageSize($images[0]->thumb_path, 360, 203);
+    }
+
+    public function test_uploaded_project_images_are_contained_without_cropping(): void
+    {
+        Storage::fake('public');
+
+        $this->actingAs($this->user)
+            ->post('/admin/projects', [
+                'title' => 'Tall Screenshot',
+                'description' => 'Project with a tall interface screenshot.',
+                'published' => true,
+                'uploaded_images' => [
+                    UploadedFile::fake()->image('mobile-screen.jpg', 600, 1200),
+                ],
+                'uploaded_images_meta' => [
+                    [
+                        'alt' => 'Mobile screen',
+                        'sort_order' => 1,
+                    ],
+                ],
+            ])
+            ->assertRedirect();
+
+        $image = Project::query()
+            ->where('slug', 'tall-screenshot')
+            ->firstOrFail()
+            ->images()
+            ->firstOrFail();
+
+        $this->assertImageSize($image->large_path, 1600, 900);
+        $this->assertImageSize($image->card_path, 900, 506);
+        $this->assertImageSize($image->thumb_path, 360, 203);
     }
 
     public function test_admin_cannot_save_more_than_five_project_images(): void

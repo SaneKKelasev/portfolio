@@ -15,6 +15,8 @@ use RuntimeException;
 
 final class ProjectImageProcessor
 {
+    private const BACKGROUND = '#070a13';
+
     private const QUALITY = 82;
 
     /**
@@ -58,7 +60,7 @@ final class ProjectImageProcessor
             Storage::disk('public')->put(
                 $path,
                 $image
-                    ->coverDown($size['width'], $size['height'])
+                    ->containDown($size['width'], $size['height'], self::BACKGROUND)
                     ->encode(new WebpEncoder(quality: self::QUALITY, strip: true))
                     ->toString(),
             );

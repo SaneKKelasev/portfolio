@@ -2,7 +2,8 @@
 import ContactForm from '@/Components/Contact/Form.vue';
 import ProjectCard from '@/Components/Project/Card.vue';
 import SiteHeader from '@/Components/SiteHeader.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 defineProps({
     projects: {
@@ -15,6 +16,9 @@ defineProps({
         required: true,
     },
 });
+
+const page = usePage();
+const adminHref = computed(() => (page.props.auth?.user ? '/admin' : '/login'));
 </script>
 
 <template>
@@ -73,32 +77,100 @@ defineProps({
                     </p>
                 </div>
 
-                <div
-                    class="grid grid-cols-3 overflow-hidden rounded-2xl border
-                           border-border bg-surface/75 shadow-2xl
-                           shadow-black/30 backdrop-blur"
+                <aside
+                    class="rounded-2xl border border-border bg-surface/75 p-5
+                           shadow-2xl shadow-black/30 backdrop-blur"
                 >
-                    <div class="border-r border-border p-5">
-                        <p class="text-2xl font-semibold text-text">Backend</p>
-                        <p class="mt-1 text-xs uppercase tracking-wide text-text-muted">
-                            Laravel
-                        </p>
+                    <p
+                        class="text-xs font-semibold uppercase tracking-[0.18em]
+                               text-accent"
+                    >
+                        Быстрая проверка
+                    </p>
+
+                    <div class="mt-5 space-y-4">
+                        <div class="flex gap-3">
+                            <span
+                                class="mt-1 flex h-6 w-6 shrink-0 items-center
+                                       justify-center rounded-full
+                                       border border-accent/60 text-xs
+                                       font-semibold text-accent"
+                            >
+                                1
+                            </span>
+                            <div>
+                                <p class="font-semibold text-text">
+                                    Откройте демо-админку
+                                </p>
+                                <p class="mt-1 text-sm leading-6 text-text-muted">
+                                    Можно посмотреть CRUD, роли и защиту данных.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <span
+                                class="mt-1 flex h-6 w-6 shrink-0 items-center
+                                       justify-center rounded-full
+                                       border border-accent/60 text-xs
+                                       font-semibold text-accent"
+                            >
+                                2
+                            </span>
+                            <div>
+                                <p class="font-semibold text-text">
+                                    Проверьте проект PortfolioHub
+                                </p>
+                                <p class="mt-1 text-sm leading-6 text-text-muted">
+                                    Backend, галерея, фильтры, формы и тесты
+                                    работают как единый продукт.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <span
+                                class="mt-1 flex h-6 w-6 shrink-0 items-center
+                                       justify-center rounded-full
+                                       border border-success/60 text-xs
+                                       font-semibold text-success"
+                            >
+                                ✓
+                            </span>
+                            <div>
+                                <p class="font-semibold text-text">
+                                    Код готов к review
+                                </p>
+                                <p class="mt-1 text-sm leading-6 text-text-muted">
+                                    Есть миграции, сидеры, feature tests и CI.
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="border-r border-border p-5">
-                        <p class="text-2xl font-semibold text-accent">Frontend</p>
-                        <p class="mt-1 text-xs uppercase tracking-wide text-text-muted">
-                            Vue + Inertia
-                        </p>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <Link
+                            :href="adminHref"
+                            class="rounded-full bg-primary px-5 py-3 text-sm
+                                   font-semibold text-white shadow-lg
+                                   shadow-primary/25 transition
+                                   hover:bg-violet-500"
+                        >
+                            Демо-админка
+                        </Link>
+                        <a
+                            href="https://github.com/SaneKKelasev/portfolio"
+                            target="_blank"
+                            rel="noreferrer"
+                            class="rounded-full border border-border-bright/70
+                                   px-5 py-3 text-sm font-semibold
+                                   text-text-muted transition
+                                   hover:border-accent/70 hover:text-white"
+                        >
+                            GitHub
+                        </a>
                     </div>
-
-                    <div class="p-5">
-                        <p class="text-2xl font-semibold text-success">Quality</p>
-                        <p class="mt-1 text-xs uppercase tracking-wide text-text-muted">
-                            Tests + CI
-                        </p>
-                    </div>
-                </div>
+                </aside>
             </header>
 
             <div class="mt-10 space-y-8 sm:mt-12 lg:space-y-10">

@@ -97,6 +97,14 @@ final class Project extends Model
     }
 
     /**
+     * @return HasMany<ProjectView, $this>
+     */
+    public function views(): HasMany
+    {
+        return $this->hasMany(ProjectView::class);
+    }
+
+    /**
      * @return BelongsToMany<Technology, $this>
      */
     public function technologies(): BelongsToMany

@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProjectRequest;
 use App\Models\Project;
 use App\Models\Technology;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -25,6 +26,9 @@ final class ProjectController extends Controller
 
         return Inertia::render('Admin/Projects/Index', [
             'projects' => $projects->map(fn (Project $project): array => $this->projectRow($project)),
+            'permissions' => [
+                'can_manage_protected_projects' => $this->canManageProtectedContent(),
+            ],
             'meta' => [
                 'title' => 'Проекты — Админка',
                 'description' => 'Управление проектами PortfolioHub.',
@@ -63,7 +67,7 @@ final class ProjectController extends Controller
 
     public function edit(Project $project): Response
     {
-        abort_if($project->is_protected, 403);
+        abort_if($this->cannotChange($project), 403);
 
         $project->load([
             'images',
@@ -82,7 +86,7 @@ final class ProjectController extends Controller
 
     public function update(ProjectRequest $request, Project $project, SaveProjectAction $action): RedirectResponse
     {
-        abort_if($project->is_protected, 403);
+        abort_if($this->cannotChange($project), 403);
 
         $action->execute(
             $project,
@@ -99,7 +103,7 @@ final class ProjectController extends Controller
 
     public function destroy(Project $project): RedirectResponse
     {
-        abort_if($project->is_protected, 403);
+        abort_if($this->cannotChange($project), 403);
 
         $project->delete();
 
@@ -133,6 +137,8 @@ final class ProjectController extends Controller
             'slug' => $project->slug,
             'published' => $project->published_at !== null,
             'is_protected' => $project->is_protected,
+            'can_update' => ! $project->is_protected || $this->canManageProtectedContent(),
+            'can_delete' => ! $project->is_protected || $this->canManageProtectedContent(),
             'updated_at' => $project->updated_at?->format('Y-m-d H:i'),
             'technologies' => $project->technologies->pluck('name')->all(),
         ];
@@ -169,5 +175,17 @@ final class ProjectController extends Controller
                 'sort_order' => $image->sort_order,
             ])->values()->all() ?? [],
         ];
+    }
+
+    private function cannotChange(Project $project): bool
+    {
+        return $project->is_protected && ! $this->canManageProtectedContent();
+    }
+
+    private function canManageProtectedContent(): bool
+    {
+        $user = request()->user();
+
+        return $user instanceof User && $user->canManageProtectedContent();
     }
 }

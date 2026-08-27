@@ -88,39 +88,46 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="min-w-0">
-        <button
+        <div
             v-if="activeImage"
-            type="button"
-            aria-label="Открыть изображение на весь экран"
-            class="group relative block w-full cursor-zoom-in overflow-hidden rounded-2xl border border-border-bright/70
+            class="flex aspect-video w-full items-center justify-center
+                   overflow-hidden rounded-2xl border border-border-bright/70
                    bg-background/70 shadow-2xl shadow-primary/10
                    transition hover:border-accent/70"
-            @click="openLightbox"
         >
-            <img
-                :key="activeImage.id"
-                :src="activeImageUrl"
-                :alt="activeImage.alt ?? ''"
-                class="aspect-video w-full object-contain"
+            <button
+                type="button"
+                aria-label="Открыть изображение на весь экран"
+                class="group/image relative inline-flex max-h-full max-w-full
+                       cursor-zoom-in overflow-hidden"
+                @click="openLightbox"
             >
-            <span
-                class="absolute inset-0 flex items-center justify-center
-                       bg-background/0 opacity-0 transition duration-200
-                       group-hover:bg-background/45 group-hover:opacity-100"
-            >
-                <span
-                    class="inline-flex items-center gap-2 rounded-full border
-                           border-border-bright/70 bg-surface/85 px-4 py-2
-                           text-sm font-semibold text-white shadow-xl
-                           shadow-black/30"
+                <img
+                    :key="activeImage.id"
+                    :src="activeImageUrl"
+                    :alt="activeImage.alt ?? ''"
+                    class="block max-h-full max-w-full object-contain"
                 >
-                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none">
-                        <path d="M7 3H3v4M13 3h4v4M7 17H3v-4M13 17h4v-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    На весь экран
+                <span
+                    class="absolute inset-0 flex items-center justify-center
+                           bg-background/0 opacity-0 transition duration-200
+                           group-hover/image:bg-background/45
+                           group-hover/image:opacity-100"
+                >
+                    <span
+                        class="inline-flex items-center gap-2 rounded-full border
+                               border-border-bright/70 bg-surface/85 px-4 py-2
+                               text-sm font-semibold text-white shadow-xl
+                               shadow-black/30"
+                    >
+                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none">
+                            <path d="M7 3H3v4M13 3h4v4M7 17H3v-4M13 17h4v-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        На весь экран
+                    </span>
                 </span>
-            </span>
-        </button>
+            </button>
+        </div>
 
         <div
             v-if="images.length > 1"

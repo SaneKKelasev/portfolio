@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\ContactMessage;
+use App\Models\Project;
+use App\Models\ProjectView;
+use App\Models\Technology;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -44,7 +48,49 @@ final class AdminAccessTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (Assert $page): Assert => $page
                 ->component('Admin/Dashboard')
-                ->has('stats'));
+                ->has('stats')
+                ->has('analytics.viewsByDay.labels', 7)
+                ->has('analytics.viewsByDay.values', 7)
+                ->has('analytics.messagesByDay.labels', 7)
+                ->has('analytics.messagesByDay.values', 7));
+    }
+
+    public function test_dashboard_displays_portfolio_analytics(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->create([
+            'title' => 'PortfolioHub',
+            'published_at' => now(),
+        ]);
+        $technology = Technology::query()->create([
+            'name' => 'Laravel',
+            'slug' => 'laravel',
+        ]);
+        $project->technologies()->attach($technology);
+
+        ProjectView::query()->create([
+            'project_id' => $project->id,
+            'visitor_hash' => hash('sha256', 'visitor'),
+            'viewed_on' => now()->toDateString(),
+            'viewed_at' => now(),
+        ]);
+        ContactMessage::query()->create([
+            'name' => 'Александр',
+            'email' => 'alex@example.com',
+            'message' => 'Здравствуйте.',
+        ]);
+
+        $this->actingAs($user)
+            ->get('/admin')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page): Assert => $page
+                ->component('Admin/Dashboard')
+                ->where('analytics.viewsByDay.values.6', 1)
+                ->where('analytics.messagesByDay.values.6', 1)
+                ->where('analytics.topProjects.0.title', 'PortfolioHub')
+                ->where('analytics.topProjects.0.views', 1)
+                ->where('analytics.technologyUsage.0.name', 'Laravel')
+                ->where('analytics.technologyUsage.0.projects', 1));
     }
 
     public function test_user_can_logout(): void

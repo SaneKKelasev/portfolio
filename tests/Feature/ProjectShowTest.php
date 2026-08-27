@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Project;
+use App\Models\ProjectView;
 use App\Models\Technology;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -57,6 +58,23 @@ final class ProjectShowTest extends TestCase
                 ->has('project.technologies', 1)
                 ->where('project.technologies.0.slug', 'laravel')
                 ->where('meta.title', 'PortfolioHub — PortfolioHub'));
+
+        $this->assertDatabaseHas('project_views', [
+            'project_id' => $project->id,
+        ]);
+    }
+
+    public function test_project_view_is_counted_once_per_visitor_per_day(): void
+    {
+        $project = Project::factory()->create([
+            'slug' => 'portfoliohub',
+            'published_at' => now(),
+        ]);
+
+        $this->get('/projects/portfoliohub')->assertOk();
+        $this->get('/projects/portfoliohub')->assertOk();
+
+        $this->assertSame(1, ProjectView::query()->whereBelongsTo($project)->count());
     }
 
     public function test_project_detail_page_does_not_display_draft_project(): void
@@ -68,5 +86,7 @@ final class ProjectShowTest extends TestCase
 
         $this->get('/projects/draft-project')
             ->assertNotFound();
+
+        $this->assertDatabaseCount('project_views', 0);
     }
 }

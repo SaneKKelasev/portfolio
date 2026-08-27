@@ -28,7 +28,6 @@ final class ProjectIndexController extends Controller
             ->withQueryString();
 
         $technologies = Technology::query()
-            ->whereHas('projects', static fn ($query) => $query->published())
             ->orderBy('name')
             ->get([
                 'name',

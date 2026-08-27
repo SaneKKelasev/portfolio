@@ -1,4 +1,7 @@
 <script setup>
+import FormCheckbox from '@/Components/Form/Checkbox.vue';
+import FormInput from '@/Components/Form/Input.vue';
+import FormTextarea from '@/Components/Form/Textarea.vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { VueDatePicker } from '@vuepic/vue-datepicker';
@@ -59,8 +62,6 @@ const galleryItems = ref((props.project.images ?? []).map((image, index) => ({
     sort_order: image.sort_order ?? index + 1,
 })));
 
-const textareaClass = 'mt-2 w-full min-h-36 max-h-72 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
-const caseTextareaClass = 'mt-2 w-full min-h-40 max-h-80 resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent';
 const datePickerClass = 'portfolio-date-picker mt-2';
 const labelClass = 'flex items-center gap-2 text-sm font-semibold text-text';
 const requiredBadgeClass = 'rounded-full bg-accent/10 px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-wide text-accent';
@@ -282,13 +283,11 @@ function submit() {
                         Название
                         <span :class="requiredBadgeClass">Обязательно</span>
                     </span>
-                    <input
+                    <FormInput
                         v-model="form.title"
                         required
-                        class="mt-2 w-full rounded-2xl border border-border
-                               bg-background/70 px-4 py-3 text-text outline-none
-                               focus:border-accent"
-                    >
+                        :invalid="Boolean(form.errors.title || form.errors.slug)"
+                    />
                     <span v-if="form.errors.title" class="mt-2 block text-sm text-rose-300">
                         {{ form.errors.title }}
                     </span>
@@ -302,11 +301,11 @@ function submit() {
                         Описание
                         <span :class="requiredBadgeClass">Обязательно</span>
                     </span>
-                    <textarea
+                    <FormTextarea
                         v-model="form.description"
                         required
                         rows="4"
-                        :class="textareaClass"
+                        :invalid="Boolean(form.errors.description)"
                     />
                     <span v-if="form.errors.description" class="mt-2 block text-sm text-rose-300">
                         {{ form.errors.description }}
@@ -318,12 +317,10 @@ function submit() {
                         Сайт
                         <span :class="optionalBadgeClass">Необязательно</span>
                     </span>
-                    <input
+                    <FormInput
                         v-model="form.website_url"
-                        class="mt-2 w-full rounded-2xl border border-border
-                               bg-background/70 px-4 py-3 text-text outline-none
-                               focus:border-accent"
-                    >
+                        :invalid="Boolean(form.errors.website_url)"
+                    />
                     <span v-if="form.errors.website_url" class="mt-2 block text-sm text-rose-300">
                         {{ form.errors.website_url }}
                     </span>
@@ -334,12 +331,10 @@ function submit() {
                         Репозиторий
                         <span :class="optionalBadgeClass">Необязательно</span>
                     </span>
-                    <input
+                    <FormInput
                         v-model="form.repository_url"
-                        class="mt-2 w-full rounded-2xl border border-border
-                               bg-background/70 px-4 py-3 text-text outline-none
-                               focus:border-accent"
-                    >
+                        :invalid="Boolean(form.errors.repository_url)"
+                    />
                     <span v-if="form.errors.repository_url" class="mt-2 block text-sm text-rose-300">
                         {{ form.errors.repository_url }}
                     </span>
@@ -401,7 +396,7 @@ function submit() {
                 </label>
 
                 <label class="flex items-center gap-3 lg:col-span-2">
-                    <input v-model="form.published" type="checkbox">
+                    <FormCheckbox v-model="form.published" />
                     <span class="text-sm font-semibold text-text">
                         Опубликован
                     </span>
@@ -417,21 +412,21 @@ function submit() {
                         Задача
                         <span :class="optionalBadgeClass">Необязательно</span>
                     </span>
-                    <textarea v-model="form.problem" rows="6" :class="caseTextareaClass" />
+                    <FormTextarea v-model="form.problem" rows="6" class="min-h-40 max-h-80" />
                 </label>
                 <label class="block">
                     <span :class="labelClass">
                         Решение
                         <span :class="optionalBadgeClass">Необязательно</span>
                     </span>
-                    <textarea v-model="form.solution" rows="6" :class="caseTextareaClass" />
+                    <FormTextarea v-model="form.solution" rows="6" class="min-h-40 max-h-80" />
                 </label>
                 <label class="block">
                     <span :class="labelClass">
                         Результат
                         <span :class="optionalBadgeClass">Необязательно</span>
                     </span>
-                    <textarea v-model="form.result" rows="6" :class="caseTextareaClass" />
+                    <FormTextarea v-model="form.result" rows="6" class="min-h-40 max-h-80" />
                 </label>
             </section>
 
@@ -559,7 +554,7 @@ function submit() {
                                 <span class="text-xs font-semibold text-text-muted">
                                     Описание изображения
                                 </span>
-                                <input v-model="image.alt" placeholder="Например: Главный экран проекта" class="mt-2 w-full rounded-2xl border border-border bg-background/70 px-4 py-3 text-text outline-none focus:border-accent">
+                                <FormInput v-model="image.alt" placeholder="Например: Главный экран проекта" />
                             </label>
 
                             <div class="mt-3 flex flex-wrap items-center gap-2">

@@ -82,13 +82,13 @@ function selectImage(index) {
                     class="text-xs font-semibold uppercase tracking-[0.18em]
                            text-accent"
                 >
-                    Галерея проекта
+                    Демо-галерея
                 </p>
                 <p class="mt-3 text-lg font-semibold text-text">
                     {{ title }}
                 </p>
                 <p class="mt-2 text-sm text-text-muted">
-                    Изображения пока не добавлены
+                    Скриншоты для этого демо-кейса пока не добавлены
                 </p>
             </div>
         </div>

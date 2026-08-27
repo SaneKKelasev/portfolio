@@ -1,4 +1,5 @@
 <script setup>
+import FormInput from '@/Components/Form/Input.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 
 defineProps({
@@ -45,13 +46,11 @@ function submit() {
 
             <label class="mt-8 block">
                 <span class="text-sm font-semibold text-text">Email</span>
-                <input
+                <FormInput
                     v-model="form.email"
                     type="email"
-                    class="mt-2 w-full rounded-2xl border border-border
-                           bg-background/70 px-4 py-3 text-text outline-none
-                           transition focus:border-accent"
-                >
+                    :invalid="Boolean(form.errors.email)"
+                />
                 <span
                     v-if="form.errors.email"
                     class="mt-2 block text-sm text-rose-300"
@@ -62,13 +61,11 @@ function submit() {
 
             <label class="mt-5 block">
                 <span class="text-sm font-semibold text-text">Пароль</span>
-                <input
+                <FormInput
                     v-model="form.password"
                     type="password"
-                    class="mt-2 w-full rounded-2xl border border-border
-                           bg-background/70 px-4 py-3 text-text outline-none
-                           transition focus:border-accent"
-                >
+                    :invalid="Boolean(form.errors.password)"
+                />
                 <span
                     v-if="form.errors.password"
                     class="mt-2 block text-sm text-rose-300"

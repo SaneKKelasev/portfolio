@@ -18,7 +18,7 @@ final class HomeController extends Controller
             ])
             ->published()
             ->latest('published_at')
-            ->limit(6)
+            ->limit(3)
             ->get();
 
         return Inertia::render('Home/Index', [

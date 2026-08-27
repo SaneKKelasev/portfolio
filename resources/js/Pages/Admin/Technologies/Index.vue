@@ -1,4 +1,5 @@
 <script setup>
+import FormInput from '@/Components/Form/Input.vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
@@ -103,12 +104,10 @@ function destroyTechnology(technology) {
         >
             <label class="block">
                 <span class="text-sm font-semibold text-text">Название</span>
-                <input
+                <FormInput
                     v-model="createForm.name"
-                    class="mt-2 w-full rounded-2xl border border-border
-                           bg-background/70 px-4 py-3 text-text outline-none
-                           focus:border-accent"
-                >
+                    :invalid="Boolean(createForm.errors.name)"
+                />
                 <span v-if="createForm.errors.name" class="mt-2 block text-sm text-rose-300">
                     {{ createForm.errors.name }}
                 </span>
@@ -116,13 +115,11 @@ function destroyTechnology(technology) {
 
             <label class="block">
                 <span class="text-sm font-semibold text-text">Slug</span>
-                <input
+                <FormInput
                     v-model="createForm.slug"
                     placeholder="Можно оставить пустым"
-                    class="mt-2 w-full rounded-2xl border border-border
-                           bg-background/70 px-4 py-3 text-text outline-none
-                           focus:border-accent"
-                >
+                    :invalid="Boolean(createForm.errors.slug)"
+                />
                 <span v-if="createForm.errors.slug" class="mt-2 block text-sm text-rose-300">
                     {{ createForm.errors.slug }}
                 </span>
@@ -156,12 +153,10 @@ function destroyTechnology(technology) {
                 >
                     <label class="block">
                         <span class="text-sm font-semibold text-text">Название</span>
-                        <input
+                        <FormInput
                             v-model="editForm.name"
-                            class="mt-2 w-full rounded-2xl border border-border
-                                   bg-background/70 px-4 py-3 text-text outline-none
-                                   focus:border-accent"
-                        >
+                            :invalid="Boolean(editForm.errors.name)"
+                        />
                         <span v-if="editForm.errors.name" class="mt-2 block text-sm text-rose-300">
                             {{ editForm.errors.name }}
                         </span>
@@ -169,12 +164,10 @@ function destroyTechnology(technology) {
 
                     <label class="block">
                         <span class="text-sm font-semibold text-text">Slug</span>
-                        <input
+                        <FormInput
                             v-model="editForm.slug"
-                            class="mt-2 w-full rounded-2xl border border-border
-                                   bg-background/70 px-4 py-3 text-text outline-none
-                                   focus:border-accent"
-                        >
+                            :invalid="Boolean(editForm.errors.slug)"
+                        />
                         <span v-if="editForm.errors.slug" class="mt-2 block text-sm text-rose-300">
                             {{ editForm.errors.slug }}
                         </span>

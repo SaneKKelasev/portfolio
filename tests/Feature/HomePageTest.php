@@ -88,9 +88,9 @@ final class HomePageTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertInertia(fn (Assert $page): Assert => $page
-                ->has('projects', 6)
+                ->has('projects', 3)
                 ->where('projects.0.title', 'Project 8')
                 ->where('projects.1.title', 'Project 7')
-                ->where('projects.5.title', 'Project 3'));
+                ->where('projects.2.title', 'Project 6'));
     }
 }

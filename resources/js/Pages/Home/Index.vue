@@ -52,7 +52,7 @@ defineProps({
                                text-xs font-semibold uppercase
                                tracking-[0.18em] text-violet-200"
                     >
-                        Мои проекты
+                        PHP / Laravel портфолио
                     </p>
 
                     <h1
@@ -60,16 +60,16 @@ defineProps({
                                sm:text-5xl
                                lg:text-6xl lg:leading-[1.04]"
                     >
-                        Проекты, которые я создаю
+                        Разбираю задачи и довожу их до работающего продукта
                     </h1>
 
                     <p
                         class="mt-6 max-w-2xl text-base leading-7
                                text-text-muted sm:text-lg sm:leading-8"
                     >
-                        Каждый проект — это решение реальной задачи с вниманием
-                        к архитектуре, производительности и удобству
-                        использования.
+                        Здесь собраны проекты, где важны не только экраны, но и
+                        backend: модели, связи, валидация, тесты, деплой и
+                        понятная структура кода.
                     </p>
                 </div>
 
@@ -79,23 +79,23 @@ defineProps({
                            shadow-black/30 backdrop-blur"
                 >
                     <div class="border-r border-border p-5">
-                        <p class="text-2xl font-semibold text-text">Laravel</p>
+                        <p class="text-2xl font-semibold text-text">Backend</p>
                         <p class="mt-1 text-xs uppercase tracking-wide text-text-muted">
-                            backend
+                            Laravel
                         </p>
                     </div>
 
                     <div class="border-r border-border p-5">
-                        <p class="text-2xl font-semibold text-accent">Vue</p>
+                        <p class="text-2xl font-semibold text-accent">Frontend</p>
                         <p class="mt-1 text-xs uppercase tracking-wide text-text-muted">
-                            inertia
+                            Vue + Inertia
                         </p>
                     </div>
 
                     <div class="p-5">
-                        <p class="text-2xl font-semibold text-success">Tests</p>
+                        <p class="text-2xl font-semibold text-success">Quality</p>
                         <p class="mt-1 text-xs uppercase tracking-wide text-text-muted">
-                            ci ready
+                            Tests + CI
                         </p>
                     </div>
                 </div>

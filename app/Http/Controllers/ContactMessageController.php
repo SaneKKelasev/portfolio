@@ -12,7 +12,7 @@ final class ContactMessageController extends Controller
 {
     public function store(StoreContactMessageRequest $request): RedirectResponse
     {
-        ContactMessage::query()->create($request->validated());
+        ContactMessage::query()->create($request->safe()->except('privacy_consent'));
 
         return back()->with('success', 'Сообщение отправлено. Я свяжусь с вами в ближайшее время.');
     }

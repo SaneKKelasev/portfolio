@@ -3,7 +3,17 @@ import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const page = usePage();
-const adminHref = computed(() => (page.props.auth?.user ? '/admin' : '/login'));
+
+const isProjectsActive = computed(() => page.url.startsWith('/projects'));
+
+function navClass(isActive) {
+    return [
+        'rounded-full px-4 py-2 transition',
+        isActive
+            ? 'bg-primary text-white shadow-lg shadow-primary/20'
+            : 'text-violet-100 hover:bg-primary hover:text-white',
+    ];
+}
 </script>
 
 <template>
@@ -30,26 +40,16 @@ const adminHref = computed(() => (page.props.auth?.user ? '/admin' : '/login'));
         >
             <Link
                 href="/projects"
-                class="rounded-full px-4 py-2 text-text-muted transition
-                       hover:bg-white/[0.04] hover:text-white"
+                :class="navClass(isProjectsActive)"
             >
                 Проекты
             </Link>
             <a
                 href="/#contact"
-                class="rounded-full px-4 py-2 text-text-muted transition
-                       hover:bg-white/[0.04] hover:text-white"
+                :class="navClass(false)"
             >
                 Контакты
             </a>
-            <Link
-                :href="adminHref"
-                class="rounded-full bg-primary px-4 py-2 text-white
-                       shadow-lg shadow-primary/20 transition
-                       hover:bg-violet-500"
-            >
-                Админка
-            </Link>
         </nav>
     </header>
 </template>

@@ -26,17 +26,15 @@ import { Link } from '@inertiajs/vue3';
         >
             <Link
                 href="/projects"
-                class="rounded-full border border-primary/40 px-4 py-2
-                       text-violet-100 transition hover:bg-primary
-                       hover:text-white"
+                class="rounded-full px-4 py-2 text-violet-100
+                       transition hover:bg-primary hover:text-white"
             >
                 Проекты
             </Link>
             <a
                 href="/#contact"
-                class="rounded-full border border-primary/40 px-4 py-2
-                       text-violet-100 transition hover:bg-primary
-                       hover:text-white"
+                class="rounded-full px-4 py-2 text-violet-100
+                       transition hover:bg-primary hover:text-white"
             >
                 Контакты
             </a>

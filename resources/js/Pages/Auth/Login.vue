@@ -10,8 +10,8 @@ defineProps({
 });
 
 const form = useForm({
-    email: '',
-    password: '',
+    email: 'admin@example.com',
+    password: 'password',
 });
 
 function submit() {
@@ -43,8 +43,12 @@ function submit() {
             <h1 class="mt-4 text-3xl font-semibold text-text">
                 Вход в панель
             </h1>
+            <p class="mt-3 text-sm leading-6 text-text-muted">
+                Демо-доступ уже подставлен. Можно сразу открыть панель и
+                посмотреть, как работает управление проектами.
+            </p>
 
-            <label class="mt-8 block">
+            <label class="mt-6 block">
                 <span class="text-sm font-semibold text-text">Email</span>
                 <FormInput
                     v-model="form.email"

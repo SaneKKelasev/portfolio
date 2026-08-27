@@ -1,9 +1,5 @@
 <script setup>
-import { Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
-
-const page = usePage();
-const adminHref = computed(() => (page.props.auth?.user ? '/admin' : '/login'));
+import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
@@ -30,26 +26,20 @@ const adminHref = computed(() => (page.props.auth?.user ? '/admin' : '/login'));
         >
             <Link
                 href="/projects"
-                class="rounded-full px-4 py-2 text-text-muted transition
-                       hover:bg-white/[0.04] hover:text-white"
+                class="rounded-full border border-primary/40 px-4 py-2
+                       text-violet-100 transition hover:bg-primary
+                       hover:text-white"
             >
                 Проекты
             </Link>
             <a
                 href="/#contact"
-                class="rounded-full px-4 py-2 text-text-muted transition
-                       hover:bg-white/[0.04] hover:text-white"
+                class="rounded-full border border-primary/40 px-4 py-2
+                       text-violet-100 transition hover:bg-primary
+                       hover:text-white"
             >
                 Контакты
             </a>
-            <Link
-                :href="adminHref"
-                class="rounded-full bg-primary px-4 py-2 text-white
-                       shadow-lg shadow-primary/20 transition
-                       hover:bg-violet-500"
-            >
-                Админка
-            </Link>
         </nav>
     </header>
 </template>

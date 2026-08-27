@@ -19,7 +19,7 @@ const page = usePage();
 const successMessage = computed(() => page.props.flash?.success ?? null);
 
 function destroyProject(project) {
-    if (project.is_protected) {
+    if (!project.can_delete) {
         return;
     }
 
@@ -127,7 +127,7 @@ function destroyProject(project) {
                         Не опубликован
                     </span>
                     <Link
-                        v-if="!project.is_protected"
+                        v-if="project.can_update"
                         :href="`/admin/projects/${project.id}/edit`"
                         class="rounded-full border border-border px-4 py-2
                                text-sm font-semibold text-text-muted
@@ -143,7 +143,7 @@ function destroyProject(project) {
                         Только просмотр
                     </span>
                     <button
-                        v-if="!project.is_protected"
+                        v-if="project.can_delete"
                         type="button"
                         class="rounded-full border border-rose-400/50 px-4 py-2
                                text-sm font-semibold text-rose-300 transition

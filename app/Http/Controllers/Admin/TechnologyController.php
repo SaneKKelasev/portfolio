@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\TechnologyRequest;
 use App\Models\Technology;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -30,6 +31,8 @@ final class TechnologyController extends Controller
                 'slug' => $technology->slug,
                 'projects_count' => $technology->projects_count,
                 'has_protected_projects' => (bool) $technology->has_protected_projects,
+                'can_update' => ! $technology->has_protected_projects || $this->canManageProtectedContent(),
+                'can_delete' => ! $technology->has_protected_projects && $technology->projects_count === 0,
             ]),
             'meta' => [
                 'title' => 'Технологии — Админка',
@@ -67,9 +70,19 @@ final class TechnologyController extends Controller
 
     private function ensureTechnologyCanBeChanged(Technology $technology): void
     {
-        abort_if(
-            $technology->projects()->where('is_protected', true)->exists(),
-            403,
-        );
+        abort_if($this->cannotChange($technology), 403);
+    }
+
+    private function cannotChange(Technology $technology): bool
+    {
+        return $technology->projects()->where('is_protected', true)->exists()
+            && ! $this->canManageProtectedContent();
+    }
+
+    private function canManageProtectedContent(): bool
+    {
+        $user = request()->user();
+
+        return $user instanceof User && $user->canManageProtectedContent();
     }
 }

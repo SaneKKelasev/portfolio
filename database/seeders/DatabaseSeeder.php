@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'name' => 'PortfolioHub Admin',
+                'role' => User::ROLE_DEMO,
                 'password' => 'password',
             ],
         );

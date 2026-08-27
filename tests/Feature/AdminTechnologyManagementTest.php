@@ -75,7 +75,7 @@ final class AdminTechnologyManagementTest extends TestCase
         ]);
     }
 
-    public function test_admin_cannot_modify_technology_used_by_protected_project(): void
+    public function test_demo_admin_cannot_modify_technology_used_by_protected_project(): void
     {
         $technology = Technology::query()->create([
             'name' => 'Laravel',
@@ -102,6 +102,33 @@ final class AdminTechnologyManagementTest extends TestCase
             'id' => $technology->id,
             'name' => 'Laravel',
             'slug' => 'laravel',
+        ]);
+    }
+
+    public function test_owner_can_update_technology_used_by_protected_project(): void
+    {
+        $owner = User::factory()->owner()->create();
+        $technology = Technology::query()->create([
+            'name' => 'Laravel',
+            'slug' => 'laravel',
+        ]);
+
+        $project = Project::factory()->create([
+            'is_protected' => true,
+        ]);
+        $project->technologies()->attach($technology);
+
+        $this->actingAs($owner)
+            ->put("/admin/technologies/{$technology->id}", [
+                'name' => 'Laravel Framework',
+                'slug' => 'laravel-framework',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('technologies', [
+            'id' => $technology->id,
+            'name' => 'Laravel Framework',
+            'slug' => 'laravel-framework',
         ]);
     }
 }
